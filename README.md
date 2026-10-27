@@ -1,7 +1,7 @@
-# Vyra
+# Vyra.sc
 
 ```bash
-cd Shop/Vyra
+cd Shop/Vyra.sc
 node server.js
 ```
 

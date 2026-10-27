@@ -156,11 +156,16 @@
 
   S.chrome = (active) => {
     const s = S.settings;
-    const name = S.esc(s.storeName);
+    const rawName = String(s.storeName || 'Vyra.sc');
+    const dotIdx = rawName.indexOf('.');
+    const brandHtml = dotIdx > 0
+      ? `${S.esc(rawName.slice(0, dotIdx))}<i>${S.esc(rawName.slice(dotIdx))}</i>`
+      : `${S.esc(rawName)}<i>.</i>`;
+    const name = S.esc(rawName);
     document.body.insertAdjacentHTML('afterbegin', `
     ${s.announcement ? `<div class="topbar">${S.esc(s.announcement)}</div>` : ''}
     <header class="site"><div class="container nav">
-      <a class="brand" href="/" aria-label="Inicio"><span class="brand-mark"></span>${name}<i>.</i></a>
+      <a class="brand" href="/" aria-label="Inicio"><span class="brand-mark"></span>${brandHtml}</a>
       <nav class="navlinks">
         <a href="/" class="${active === 'home' ? 'on' : ''}">Inicio</a>
         <a href="/catalogo.html" class="${active === 'catalog' ? 'on' : ''}">Catálogo</a>
@@ -193,7 +198,7 @@
 
     document.body.insertAdjacentHTML('beforeend', `
     <footer class="site"><div class="container"><div class="foot-grid">
-      <div><div class="foot-brand">${name}.</div><p class="foot-desc">${S.esc(s.footerText)}</p></div>
+      <div><div class="foot-brand">${brandHtml}</div><p class="foot-desc">${S.esc(s.footerText)}</p></div>
       <div class="foot-col"><h4>Navegación</h4><a href="/">Inicio</a><a href="/catalogo.html">Catálogo</a><a href="/catalogo.html?oferta=1">Ofertas</a></div>
       <div class="foot-col"><h4>Redes</h4>${social || '<p>Canales digitales oficiales</p>'}</div>
       <div class="foot-col"><h4>Atención directa</h4><a href="${S.waLink('Hola, quisiera recibir información.')}" target="_blank" rel="noopener">WhatsApp: +${S.esc(s.whatsapp)}</a><p>${S.esc(s.address)}</p></div>

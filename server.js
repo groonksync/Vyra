@@ -253,7 +253,7 @@ function defaultDb() {
   const now = Date.now();
   return {
     settings: {
-      storeName: 'Vyra',
+      storeName: 'Vyra.sc',
       currency: 'Bs',
       whatsapp: '59170000000',
       announcement: 'SELECCIÓN DE TECNOLOGÍA ESENCIAL · ENVÍOS A TODO EL PAÍS · ATENCIÓN DIRECTA',
@@ -356,7 +356,7 @@ function load() {
     db = JSON.parse(fs.readFileSync(srcFile, 'utf8'));
     const def = defaultDb();
     db.settings = { ...def.settings, ...db.settings };
-    if (!db.settings.storeName || db.settings.storeName.toLowerCase() === 'vyra') db.settings.storeName = 'Vyra';
+    if (!db.settings.storeName || db.settings.storeName.toLowerCase() === 'vyra') db.settings.storeName = 'Vyra.sc';
     if (!Array.isArray(db.settings.steps) || db.settings.steps.length < 3) db.settings.steps = def.settings.steps;
     if (!Array.isArray(db.settings.benefits) || db.settings.benefits.length < 4) db.settings.benefits = def.settings.benefits;
     db.categories = (db.categories || def.categories).map((c, idx) => ({

@@ -1,8 +1,8 @@
 {
-  "name": "vyra",
+  "name": "vyra.sc",
   "version": "1.0.0",
   "private": true,
-  "description": "Vyra",
+  "description": "Vyra.sc",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
