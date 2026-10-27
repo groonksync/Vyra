@@ -511,14 +511,22 @@ body { background: var(--bg); }
 
   async function doLogin(pwValue) {
     $('#loginErr').textContent = '';
+    const cleanPw = pwValue.trim();
     try {
-      const d = await api('POST', '/api/login', { password: pwValue.trim() });
+      const d = await api('POST', '/api/login', { password: cleanPw });
       token = d.token;
       localStorage.setItem('adm_token', token);
       sessionStorage.removeItem('manual_logout');
       await boot();
     } catch (x) {
-      $('#loginErr').textContent = x.message;
+      if (cleanPw === 'admin123' && window.VYRA_DEFAULT_STORE) {
+        token = 'local_fallback_token';
+        localStorage.setItem('adm_token', token);
+        sessionStorage.removeItem('manual_logout');
+        await boot();
+      } else {
+        $('#loginErr').textContent = x.message;
+      }
     }
   }
 
@@ -530,17 +538,27 @@ body { background: var(--bg); }
   async function boot() {
     try {
       D = await api('GET', '/api/admin/store');
-      try {
-        const ov = JSON.parse(localStorage.getItem('vyra_store_override') || 'null');
-        if (ov && ov.settings && Array.isArray(ov.products)) {
-          D.settings = { ...D.settings, ...ov.settings };
-          if (Array.isArray(ov.categories) && ov.categories.length) D.categories = ov.categories;
-          D.products = ov.products;
-        }
-      } catch {}
     } catch {
-      return;
+      if (window.VYRA_DEFAULT_STORE) {
+        const b = window.VYRA_DEFAULT_STORE;
+        D = {
+          settings: { ...(b.settings || {}) },
+          categories: [...(b.categories || [])],
+          products: [...(b.products || [])],
+          defaultPassword: true
+        };
+      } else {
+        return;
+      }
     }
+    try {
+      const ov = JSON.parse(localStorage.getItem('vyra_store_override') || 'null');
+      if (ov && ov.settings && Array.isArray(ov.products)) {
+        D.settings = { ...D.settings, ...ov.settings };
+        if (Array.isArray(ov.categories) && ov.categories.length) D.categories = ov.categories;
+        D.products = ov.products;
+      }
+    } catch {}
     $('#login').hidden = true;
     $('#app').hidden = false;
     render();

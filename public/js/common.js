@@ -64,10 +64,20 @@
   };
 
   S.load = async () => {
-    let d = {};
+    const base = window.VYRA_DEFAULT_STORE || { settings: {}, categories: [], products: [] };
+    let d = {
+      settings: { ...(base.settings || {}) },
+      categories: [...(base.categories || [])],
+      products: [...(base.products || [])]
+    };
     try {
       const r = await fetch('/api/store', { cache: 'no-store' });
-      if (r.ok) d = await r.json();
+      if (r.ok) {
+        const srv = await r.json();
+        if (srv && srv.settings && Array.isArray(srv.products) && srv.products.length) {
+          d = srv;
+        }
+      }
     } catch {}
     try {
       const ov = JSON.parse(localStorage.getItem('vyra_store_override') || 'null');
