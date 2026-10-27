@@ -64,10 +64,23 @@
   };
 
   S.load = async () => {
-    const r = await fetch('/api/store', { cache: 'no-store' });
-    const d = await r.json();
+    let d = {};
+    try {
+      const r = await fetch('/api/store', { cache: 'no-store' });
+      if (r.ok) d = await r.json();
+    } catch {}
+    try {
+      const ov = JSON.parse(localStorage.getItem('vyra_store_override') || 'null');
+      if (ov && ov.settings && Array.isArray(ov.products)) {
+        d = {
+          settings: { ...(d.settings || {}), ...ov.settings },
+          categories: Array.isArray(ov.categories) && ov.categories.length ? ov.categories : (d.categories || []),
+          products: ov.products.filter(p => p.visible !== false)
+        };
+      }
+    } catch {}
     Object.assign(S, d);
-    document.documentElement.style.setProperty('--accent', d.settings.accent || '#d9f059');
+    document.documentElement.style.setProperty('--accent', (d.settings && d.settings.accent) || '#d9f059');
     return d;
   };
 

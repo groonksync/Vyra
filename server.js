@@ -653,6 +653,11 @@ function serveStatic(res, file) {
 async function handleRequest(req, res) {
   try {
     const url = new URL(req.url, 'http://localhost');
+    const rewritten = url.searchParams.get('__path');
+    if (rewritten) {
+      url.pathname = rewritten.startsWith('/') ? rewritten : '/' + rewritten;
+      url.searchParams.delete('__path');
+    }
     if (url.pathname.startsWith('/api/')) return await api(req, res, url);
     if (url.pathname === '/producto.html' || url.pathname === '/producto') return send(res, 200, productPage(url, req), { 'Content-Type': MIME['.html'] });
 
