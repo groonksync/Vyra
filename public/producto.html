@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Vyra</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<!--OG-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<main class="container" id="main"><div class="skeleton" style="margin-top:40px;aspect-ratio:2/1"></div></main>
+<div class="buybar" id="buybar" hidden></div>
+<script src="/js/art.js"></script>
+<script src="/js/common.js"></script>
+<script>
+(async () => {
+  const S = Shop;
+  const { $, $$ } = S;
+  await S.load();
+  document.title = S.settings.storeName || 'Vyra';
+  S.chrome('catalog');
+  const id = new URLSearchParams(location.search).get('id');
+  const p = S.products.find(x => x.id === id);
+  if (!p) {
+    $('#main').innerHTML = `<div class="empty" style="margin-top:40px"><h3>Producto no disponible</h3><p style="margin-bottom:18px">El producto que buscas no existe o fue retirado del catálogo.</p><a class="btn btn-dark" href="/catalogo.html">Volver al catálogo</a></div>`;
+    return;
+  }
+
+  const imgs = p.images && p.images.length ? p.images : [VyraArt(p.art)];
+  const real = S.isReal(p);
+  const pct = S.pct(p);
+  const unitSaved = p.old && p.old > p.price ? (p.old - p.price) : 0;
+  const specs = Array.isArray(p.specs) ? p.specs : [];
+  const variants = Array.isArray(p.variants) ? p.variants : [];
+  let selectedVariant = variants[0] || '';
+  let qty = 1;
+
+  const relSameCat = S.products.filter(x => x.id !== p.id && x.cat === p.cat);
+  const relOthers = S.products.filter(x => x.id !== p.id && x.cat !== p.cat);
+  const rel = [...relSameCat, ...relOthers].slice(0, 8);
+
+  const buildWaUrl = () => {
+    const vText = selectedVariant ? `\n• Opción/Acabado: *${selectedVariant}*` : '';
+    const qText = qty > 1 ? `\n• Cantidad: *${qty} unidades*` : '';
+    const totalText = `\n• Total: *${S.money(p.price * qty)}*`;
+    const custom = p.waCustom ? `\n${p.waCustom}` : '';
+    return S.waLink(`Hola, deseo solicitar este producto:\n*${p.name}*${p.sku ? ` (${p.sku})` : ''}${vText}${qText}${totalText}${custom}\n${S.productUrl(p)}\n¿Tienen disponibilidad para envío?`);
+  };
+
+  $('#main').innerHTML = `
+  <div class="pdp-topbar">
+    <nav class="crumbs" style="padding:0">
+      <a href="/">Inicio</a><span>/</span>
+      <a href="/catalogo.html">Catálogo</a><span>/</span>
+      <a href="/catalogo.html?cat=${p.cat}">${S.esc(S.catName(p.cat))}</a><span>/</span>
+      <strong>${S.esc(p.name)}</strong>
+    </nav>
+    <a class="btn btn-ghost btn-sm" href="/catalogo.html">${S.ico('chevLeft')}<span>Volver al catálogo</span></a>
+  </div>
+
+  <div class="pdp">
+    <div class="gallery">
+      <div class="gallery-main">
+        ${p.badge ? `<span class="badge">${S.esc(p.badge)}</span>` : ''}
+        ${pct ? `<span class="badge off">-${pct}% OFF</span>` : ''}
+        <div class="gallery-floating-actions">
+          <button class="btn-icon ${S.isFav(p.id) ? 'on' : ''}" id="favFloatBtn" aria-label="Guardar en favoritos" title="Guardar en favoritos">${S.ico('heart')}</button>
+          <button class="btn-icon" id="shareFloatBtn" aria-label="Compartir producto" title="Compartir producto">${S.ico('share')}</button>
+        </div>
+        <img id="gImg" class="${real ? 'real' : ''}" src="${S.esc(imgs[0])}" alt="${S.esc(p.name)}">
+      </div>
+      ${imgs.length > 1 ? `<div class="thumbs">${imgs.map((u, i) => `<button class="${i ? '' : 'on'}" data-i="${i}" aria-label="Imagen ${i + 1}"><img src="${S.esc(u)}" alt=""></button>`).join('')}</div>` : ''}
+
+      <div class="pdp-guarantees">
+        <div class="pdp-guarantee-card">
+          <div class="benefit-icon">${S.ico('truck')}</div>
+          <div>
+            <strong>Envío rápido y seguro</strong>
+            <span>Coordinación inmediata a domicilio y envíos a todo el país.</span>
+          </div>
+        </div>
+        <div class="pdp-guarantee-card">
+          <div class="benefit-icon">${S.ico('shield')}</div>
+          <div>
+            <strong>Garantía verificada</strong>
+            <span>Cada pieza cuenta con control de calidad y respaldo directo.</span>
+          </div>
+        </div>
+        <div class="pdp-guarantee-card">
+          <div class="benefit-icon">${S.ico('bolt')}</div>
+          <div>
+            <strong>Atención personalizada</strong>
+            <span>Resuelve dudas o solicita fotos reales al instante por WhatsApp.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pdp-info">
+      <div class="pdp-meta-row">
+        <span class="pdp-brand-pill">${S.esc(p.brand || S.catName(p.cat))}</span>
+        <span class="stock ${p.stock ? '' : 'out'}">${p.stock ? 'En stock · Entrega inmediata' : 'Temporalmente agotado'}</span>
+        ${p.sku ? `<span class="pdp-sku">SKU: ${S.esc(p.sku)}</span>` : ''}
+      </div>
+
+      <h1>${S.esc(p.name)}</h1>
+
+      <div class="pdp-price-card">
+        <div class="pdp-price-main">
+          <small>Precio oficial</small>
+          <div class="pdp-price">
+            <span id="unitPriceDisplay">${S.money(p.price)}</span>
+            ${pct ? `<s>${S.money(p.old)}</s><span class="pct">-${pct}%</span>` : ''}
+          </div>
+        </div>
+        ${unitSaved > 0 ? `
+        <div class="pdp-savings-pill">
+          <span>Ahorro directo</span>
+          <strong id="savedDisplay">Ahorras ${S.money(unitSaved)}</strong>
+        </div>` : ''}
+      </div>
+
+      ${p.desc ? `
+      <div class="pdp-section-block">
+        <div class="pdp-block-label">Descripción del producto</div>
+        <p class="pdp-desc">${S.esc(p.desc)}</p>
+      </div>` : ''}
+
+      ${specs.length ? `
+      <div class="pdp-section-block">
+        <div class="pdp-block-label">Especificaciones y detalles técnicos</div>
+        <div class="pdp-specs">
+          ${specs.map(sp => `<div class="pdp-spec-item"><span class="pdp-spec-check">${S.ico('check')}</span><span>${S.esc(sp)}</span></div>`).join('')}
+        </div>
+      </div>` : ''}
+
+      <div class="pdp-config-box">
+        ${variants.length ? `
+        <div class="pdp-config-group">
+          <div class="pdp-block-label">Acabado / Versión disponible: <strong id="varLabel" style="color:var(--ink)">${S.esc(selectedVariant)}</strong></div>
+          <div class="btn-row" id="varBar">
+            ${variants.map((v, i) => `<button type="button" class="chip ${i === 0 ? 'active' : ''}" data-var="${S.esc(v)}">${S.esc(v)}</button>`).join('')}
+          </div>
+        </div>` : ''}
+
+        <div class="pdp-qty-row">
+          <div>
+            <div class="pdp-block-label" style="margin-bottom:4px">Cantidad</div>
+            <div class="pdp-qty-control">
+              <button type="button" id="qtyMinus" aria-label="Disminuir cantidad">−</button>
+              <span id="qtyVal">1</span>
+              <button type="button" id="qtyPlus" aria-label="Aumentar cantidad">+</button>
+            </div>
+          </div>
+          <div class="pdp-subtotal-box">
+            <small>Total estimado</small>
+            <strong id="subtotalDisplay">${S.money(p.price)}</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="pdp-actions">
+        <div class="pdp-actions-row">
+          <a class="btn btn-wa btn-lg" id="waBuy" href="${buildWaUrl()}" target="_blank" rel="noopener">${S.WA_SVG}<span>Pedir ahora por WhatsApp</span></a>
+          <button class="btn btn-dark btn-lg" id="addBtn" ${p.stock ? '' : 'disabled'}>${S.ico('plus')}<span>Agregar a mi pedido</span></button>
+        </div>
+        <div class="pdp-actions-tertiary">
+          <button class="btn btn-ghost btn-sm" id="shareBtn">${S.ico('share')}<span>Compartir</span></button>
+          <button class="btn btn-ghost btn-sm" id="recBtn">${S.ico('arrowUpRight')}<span>Recomendar</span></button>
+          <button class="btn btn-ghost btn-sm" id="copyLinkBtn">${S.ico('copy')}<span>Copiar link</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bloque de pestañas de información estructurada -->
+  <section class="pdp-tabs-wrap">
+    <div class="pdp-tabs-nav" id="pdpTabsNav">
+      <button type="button" class="chip active" data-tab="ficha">Ficha técnica completa</button>
+      <button type="button" class="chip" data-tab="envio">Envío y entrega</button>
+      <button type="button" class="chip" data-tab="garantia">Garantía y compra segura</button>
+    </div>
+    <div class="pdp-tab-panel" id="tab-ficha">
+      <div class="pdp-table">
+        <div class="pdp-table-row"><span>Producto</span><strong>${S.esc(p.name)}</strong></div>
+        <div class="pdp-table-row"><span>Categoría</span><strong>${S.esc(S.catName(p.cat))}</strong></div>
+        ${p.brand ? `<div class="pdp-table-row"><span>Línea / Clasificación</span><strong>${S.esc(p.brand)}</strong></div>` : ''}
+        ${p.sku ? `<div class="pdp-table-row"><span>Código de referencia (SKU)</span><strong>${S.esc(p.sku)}</strong></div>` : ''}
+        ${variants.length ? `<div class="pdp-table-row"><span>Opciones / Variantes</span><strong>${variants.map(S.esc).join(' · ')}</strong></div>` : ''}
+        ${specs.length ? `<div class="pdp-table-row"><span>Características clave</span><strong>${specs.map(S.esc).join(' · ')}</strong></div>` : ''}
+        <div class="pdp-table-row"><span>Estado de inventario</span><strong>${p.stock ? 'Disponible para entrega inmediata' : 'Temporalmente sin stock'}</strong></div>
+      </div>
+    </div>
+    <div class="pdp-tab-panel" id="tab-envio" hidden>
+      <div class="pdp-info-cards">
+        <div>
+          <h4>1. Confirmación inmediata</h4>
+          <p>Al hacer clic en «Pedir ahora por WhatsApp», recibimos los datos exactos del producto y variante elegida para confirmar tu despacho sin esperas.</p>
+        </div>
+        <div>
+          <h4>2. Entregas locales y nacionales</h4>
+          <p>Coordinamos envíos rápidos a domicilio en el día y despachos seguros por encomienda certificada a todo el país.</p>
+        </div>
+        <div>
+          <h4>3. Pago flexible y transparente</h4>
+          <p>Puedes abonar mediante transferencia QR, depósito bancario o coordinar el método de pago directamente con nuestro asesor.</p>
+        </div>
+      </div>
+    </div>
+    <div class="pdp-tab-panel" id="tab-garantia" hidden>
+      <div class="pdp-info-cards">
+        <div>
+          <h4>Calidad verificada</h4>
+          <p>Todos nuestros productos pasan por control previo antes del despacho para asegurar su correcto funcionamiento y presentación.</p>
+        </div>
+        <div>
+          <h4>Soporte directo post-venta</h4>
+          <p>Cuentas con comunicación directa por WhatsApp para cualquier consulta de configuración, uso o garantía.</p>
+        </div>
+        <div>
+          <h4>Recomienda o comparte fácilmente</h4>
+          <p>Usa los botones «Compartir» o «Recomendar» para enviar la ficha directa de este producto a cualquier contacto.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  ${rel.length ? `
+    <section class="section">
+      <div class="section-header">
+        <div>
+          <span class="eyebrow">Explora más opciones</span>
+          <h2>También te puede <em>interesar.</em></h2>
+        </div>
+        <div class="btn-row">
+          <div class="carousel-nav">
+            <button class="btn-icon" id="relPrev" aria-label="Anterior">${S.ico('chevLeft')}</button>
+            <button class="btn-icon" id="relNext" aria-label="Siguiente">${S.ico('chevRight')}</button>
+          </div>
+          <a class="btn btn-ghost btn-sm" href="/catalogo.html?cat=${p.cat}">Ver categoría ${S.ico('arrowUpRight')}</a>
+        </div>
+      </div>
+      <div class="carousel-wrap">
+        <div class="carousel-track" id="rel">${rel.map(S.card).join('')}</div>
+      </div>
+    </section>` : ''}`;
+
+  const updateOrderUI = () => {
+    $('#qtyVal').textContent = qty;
+    $('#subtotalDisplay').textContent = S.money(p.price * qty);
+    if ($('#savedDisplay') && unitSaved > 0) {
+      $('#savedDisplay').textContent = `Ahorras ${S.money(unitSaved * qty)}`;
+    }
+    const url = buildWaUrl();
+    $('#waBuy').href = url;
+    if ($('#bbWa')) $('#bbWa').href = url;
+    if ($('#bbAdd')) $('#bbAdd').textContent = `Agregar (${qty}) · ${S.money(p.price * qty)}`;
+  };
+
+  $('#qtyMinus').onclick = () => { if (qty > 1) { qty--; updateOrderUI(); } };
+  $('#qtyPlus').onclick = () => { if (qty < 99) { qty++; updateOrderUI(); } };
+
+  if ($('#varBar')) {
+    $('#varBar').onclick = e => {
+      const b = e.target.closest('[data-var]');
+      if (!b) return;
+      selectedVariant = b.dataset.var;
+      if ($('#varLabel')) $('#varLabel').textContent = selectedVariant;
+      $$('#varBar .chip').forEach(c => c.classList.remove('active'));
+      b.classList.add('active');
+      updateOrderUI();
+    };
+  }
+
+  const favFloatBtn = $('#favFloatBtn');
+  favFloatBtn.onclick = () => {
+    const on = S.toggleFav(p.id);
+    favFloatBtn.classList.toggle('on', on);
+    S.toast(on ? 'Guardado en tus favoritos' : 'Eliminado de favoritos');
+  };
+  $('#shareFloatBtn').onclick = () => S.shareProduct(p);
+
+  $('#addBtn').onclick = () => S.addCart(p.id, qty);
+  $('#shareBtn').onclick = () => S.shareProduct(p);
+  $('#recBtn').onclick = () => S.share({
+    title: `Te recomiendo este producto: ${p.name}`,
+    text: `Mira este producto en ${S.settings.storeName}: ${p.name} (${S.money(p.price)})`,
+    url: S.productUrl(p)
+  });
+  $('#copyLinkBtn').onclick = async () => {
+    try { await navigator.clipboard.writeText(S.productUrl(p)); } catch {}
+    S.toast('Enlace del producto copiado');
+  };
+
+  if ($('.thumbs')) {
+    $('.thumbs').onclick = e => {
+      const b = e.target.closest('[data-i]');
+      if (!b) return;
+      $('#gImg').src = imgs[b.dataset.i];
+      $('.thumbs .on').classList.remove('on');
+      b.classList.add('on');
+    };
+  }
+
+  $('#pdpTabsNav').onclick = e => {
+    const b = e.target.closest('[data-tab]');
+    if (!b) return;
+    $$('#pdpTabsNav .chip').forEach(c => c.classList.remove('active'));
+    b.classList.add('active');
+    ['ficha', 'envio', 'garantia'].forEach(t => {
+      const panel = $(`#tab-${t}`);
+      if (panel) panel.hidden = (t !== b.dataset.tab);
+    });
+  };
+
+  if ($('#rel')) {
+    const relTrack = $('#rel');
+    S.bindCards(relTrack);
+    S.enableDragScroll(relTrack);
+    $('#relPrev').onclick = () => relTrack.scrollBy({ left: -460, behavior: 'smooth' });
+    $('#relNext').onclick = () => relTrack.scrollBy({ left: 460, behavior: 'smooth' });
+  }
+
+  const bb = $('#buybar');
+  bb.hidden = false;
+  document.body.classList.add('has-buybar');
+  bb.innerHTML = `
+    <a class="btn btn-wa" id="bbWa" href="${buildWaUrl()}" target="_blank" rel="noopener">${S.WA_SVG}<span>Pedir WhatsApp</span></a>
+    <button class="btn btn-dark" id="bbAdd" ${p.stock ? '' : 'disabled'}>Agregar (1) · ${S.money(p.price)}</button>`;
+  $('#bbAdd').onclick = () => S.addCart(p.id, qty);
+  S.refreshCart();
+})();
+</script>
+</body>
+</html>

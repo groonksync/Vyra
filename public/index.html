@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Vyra</title>
+<meta name="description" content="Explora nuestro catálogo de tecnología y accesorios con atención directa por WhatsApp.">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<main>
+  <section class="container hero" id="hero"></section>
+  <div class="container benefits" id="benefits"></div>
+  <section class="container section" id="colecciones"></section>
+  <section class="container section" id="destacados"></section>
+  <section class="container section" id="ofertas"></section>
+  <section class="container section" id="editorial"></section>
+  <section class="container section" id="como-comprar"></section>
+  <section class="container" id="cta"></section>
+</main>
+<script src="/js/art.js"></script>
+<script src="/js/common.js"></script>
+<script>
+(async () => {
+  const S = Shop;
+  const { $ } = S;
+  await S.load();
+  const s = S.settings;
+  document.title = s.storeName || 'Vyra';
+  S.chrome('home');
+
+  const prods = S.products;
+  const heroImg = s.heroImage || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1200&q=85';
+  const side1Img = s.heroSide1Image || 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=900&q=85';
+  const side2Img = s.heroSide2Image || 'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=900&q=85';
+
+  /* 1. Portada Asimétrica (Imagen Amplia + 2 Imágenes Compactas Editables) */
+  $('#hero').innerHTML = `
+  <div class="hero-grid">
+    <div class="hero-main">
+      <div class="hero-copy">
+        <span class="hero-badge"><i></i>${S.esc(s.heroBadge)}</span>
+        <h1>${S.esc(s.heroTitle)} <em>${S.esc(s.heroAccent)}</em></h1>
+        <p>${S.esc(s.heroText)}</p>
+        <div class="btn-row">
+          <a class="btn btn-accent btn-lg" href="/catalogo.html">${S.esc(s.heroCta || 'Explorar catálogo')} ${S.ico('arrowUpRight')}</a>
+          <a class="btn btn-outline-light btn-lg" href="${S.waLink('Hola, quisiera recibir asesoría sobre sus productos.')}" target="_blank" rel="noopener">${S.WA_SVG}<span>${S.esc(s.heroCta2 || 'Atención en línea')}</span></a>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <img src="${S.esc(heroImg)}" alt="${S.esc(s.heroTitle)}">
+      </div>
+    </div>
+    <div class="hero-side">
+      <a class="side-card one" href="${S.esc(s.heroSide1Link || '/catalogo.html?cat=moviles')}" style="${s.heroSide1Bg ? `background:${S.esc(s.heroSide1Bg)}` : ''}">
+        <div class="side-card-info">
+          <div>
+            <small>${S.esc(s.heroSide1Sub || '01 — SIEMPRE CONTIGO')}</small>
+            <h3>${S.esc(s.heroSide1Title || 'Conecta con lo que viene.')}</h3>
+          </div>
+          <span class="side-card-btn">${S.esc(s.heroSide1Btn || 'Ver colección')} ${S.ico('arrowUpRight')}</span>
+        </div>
+        <div class="side-card-media">
+          <img src="${S.esc(side1Img)}" alt="${S.esc(s.heroSide1Title)}">
+        </div>
+      </a>
+      <a class="side-card two" href="${S.esc(s.heroSide2Link || '/catalogo.html?cat=carga')}" style="${s.heroSide2Bg ? `background:${S.esc(s.heroSide2Bg)}` : ''}">
+        <div class="side-card-info">
+          <div>
+            <small>${S.esc(s.heroSide2Sub || '02 — MÁS ENERGÍA')}</small>
+            <h3>${S.esc(s.heroSide2Title || 'Pequeño. Poderoso.')}</h3>
+          </div>
+          <span class="side-card-btn">${S.esc(s.heroSide2Btn || 'Ver colección')} ${S.ico('arrowUpRight')}</span>
+        </div>
+        <div class="side-card-media">
+          <img src="${S.esc(side2Img)}" alt="${S.esc(s.heroSide2Title)}">
+        </div>
+      </a>
+    </div>
+  </div>`;
+
+  /* 2. Franja de Beneficios con Iconos SVG */
+  $('#benefits').innerHTML = (s.benefits || []).map(b => `
+    <div class="benefit">
+      <div class="benefit-icon">${S.ico(b.icon || 'spark')}</div>
+      <div>
+        <strong>${S.esc(b.title)}</strong>
+        <span>${S.esc(b.text)}</span>
+      </div>
+    </div>
+  `).join('');
+
+  /* 3. Bento Grid Asimétrico de Categorías */
+  const defaultCatImages = [
+    'https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=1000&q=85',
+    'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?auto=format&fit=crop&w=900&q=85',
+    'https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?auto=format&fit=crop&w=900&q=85',
+    'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=1200&q=85'
+  ];
+  const cats = S.categories.slice(0, 4);
+  if (cats.length) {
+    $('#colecciones').innerHTML = `
+      <div class="section-header">
+        <div>
+          <span class="eyebrow">${S.esc(s.sec1Eyebrow || '01 / Universos de producto')}</span>
+          <h2>${S.esc(s.sec1Title || 'Explora por')} <em>${S.esc(s.sec1Accent || 'categoría.')}</em></h2>
+        </div>
+        <div class="btn-row">
+          <a class="btn btn-ghost btn-sm" href="/catalogo.html">Abrir catálogo completo ${S.ico('arrowUpRight')}</a>
+        </div>
+      </div>
+      <div class="bento-grid">
+        ${cats.map((c, idx) => {
+          const count = prods.filter(p => p.cat === c.id).length;
+          const byCatProd = prods.find(p => p.cat === c.id && S.isReal(p));
+          const img = c.image || (byCatProd ? byCatProd.images[0] : defaultCatImages[idx % defaultCatImages.length]);
+          return `
+          <a class="bento-card bento-${idx + 1}" href="/catalogo.html?cat=${S.esc(c.id)}">
+            <img src="${S.esc(img)}" alt="${S.esc(c.name)}" loading="lazy">
+            <div class="bento-top">
+              <span class="bento-index">0${idx + 1} / ${S.esc(c.name)}</span>
+              <h3>${S.esc(c.subtitle || c.name)}</h3>
+            </div>
+            <div class="bento-bottom">
+              <span class="bento-meta">${count} ${count === 1 ? 'producto' : 'productos'}</span>
+              <span class="bento-cta">${S.esc(c.cta || 'Explorar')} ${S.ico('arrowUpRight')}</span>
+            </div>
+          </a>`;
+        }).join('')}
+      </div>`;
+  }
+
+  /* 4. Carrusel Horizontal Compacto de una sola línea: "Los más destacados" (Tarjetas limpias sin specs) */
+  const featList = prods.filter(p => p.featured);
+  const carouselItems = featList.length >= 4 ? [...featList, ...prods.filter(p => !p.featured)].slice(0, 12) : prods.slice(0, 12);
+  $('#destacados').innerHTML = `
+    <div class="section-header">
+      <div>
+        <span class="eyebrow">${S.esc(s.sec3Eyebrow || '02 / Selección en tendencia')}</span>
+        <h2>${S.esc(s.sec3Title || 'Los más')} <em>${S.esc(s.sec3Accent || 'destacados.')}</em></h2>
+      </div>
+      <div class="btn-row">
+        <div class="carousel-nav">
+          <button class="btn-icon" id="carPrev" aria-label="Deslizar a la izquierda" title="Anterior">${S.ico('chevLeft')}</button>
+          <button class="btn-icon" id="carNext" aria-label="Deslizar a la derecha" title="Siguiente">${S.ico('chevRight')}</button>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="homeShareCat">${S.ico('share')}<span>Compartir catálogo</span></button>
+        <a class="btn btn-dark btn-sm" href="/catalogo.html">Ver catálogo completo ${S.ico('arrowUpRight')}</a>
+      </div>
+    </div>
+    <div class="carousel-wrap">
+      <div class="carousel-track" id="homeGrid">${carouselItems.map(S.card).join('')}</div>
+    </div>`;
+
+  /* 5. Nuevo Apartado Estratégico de Marketing: Zona de Ofertas (#ofertas) */
+  const deals = prods.filter(p => S.pct(p) > 0).sort((a, b) => (b.old - b.price) - (a.old - a.price));
+  const dealList = deals.length ? deals : prods.slice(0, 5);
+  const heroDeal = dealList[0];
+  const subDeals = dealList.slice(1, 6);
+  const maxPct = deals.reduce((m, p) => Math.max(m, S.pct(p)), 20);
+  const heroSaved = heroDeal && heroDeal.old && heroDeal.old > heroDeal.price ? (heroDeal.old - heroDeal.price) : 0;
+
+  if (heroDeal) {
+    $('#ofertas').innerHTML = `
+      <div class="section-header">
+        <div>
+          <span class="eyebrow">03 / Oportunidades por tiempo limitado</span>
+          <h2>Ofertas <em>especiales.</em></h2>
+        </div>
+        <div class="btn-row">
+          <span class="deal-header-pill">${S.ico('tag')}<span>Hasta -${maxPct}% de descuento directo</span></span>
+          <a class="btn btn-dark btn-sm" href="/catalogo.html?oferta=1">Ver todas las ofertas ${S.ico('arrowUpRight')}</a>
+        </div>
+      </div>
+      <div class="deals-marketing-layout">
+        <article class="deal-spotlight">
+          <div class="deal-spotlight-copy">
+            <div>
+              <div class="deal-tags">
+                <span class="deal-tag-live"><i></i>OFERTA PRINCIPAL</span>
+                ${S.pct(heroDeal) ? `<span class="deal-tag-off">-${S.pct(heroDeal)}% OFF</span>` : ''}
+              </div>
+              <span class="deal-cat">${S.esc(heroDeal.brand || S.catName(heroDeal.cat))}</span>
+              <h3><a href="/producto.html?id=${heroDeal.id}">${S.esc(heroDeal.name)}</a></h3>
+              <div class="deal-anchor-box">
+                <div class="deal-price-now">
+                  <small>Precio de oferta</small>
+                  <strong>${S.money(heroDeal.price)}</strong>
+                </div>
+                ${heroDeal.old ? `
+                <div class="deal-price-was">
+                  <small>Precio regular</small>
+                  <s>${S.money(heroDeal.old)}</s>
+                </div>` : ''}
+                ${heroSaved > 0 ? `
+                <div class="deal-savings-badge">
+                  <span>Ahorras hoy</span>
+                  <strong>${S.money(heroSaved)}</strong>
+                </div>` : ''}
+              </div>
+            </div>
+            <div>
+              <div class="deal-urgency">
+                <div class="deal-urgency-head">
+                  <span>Disponibilidad inmediata con precio promocional</span>
+                  <strong>Unidades limitadas</strong>
+                </div>
+                <div class="deal-bar"><i style="width:78%"></i></div>
+              </div>
+              <div class="btn-row">
+                <a class="btn btn-accent btn-lg" href="${S.waProduct(heroDeal)}" target="_blank" rel="noopener">${S.WA_SVG}<span>Aprovechar oferta por WhatsApp</span></a>
+                <button class="btn btn-outline-light btn-lg" data-add-deal="${heroDeal.id}">${S.ico('plus')}<span>Agregar al pedido</span></button>
+                <a class="btn btn-outline-light btn-lg" href="/producto.html?id=${heroDeal.id}">Ver producto ${S.ico('arrowUpRight')}</a>
+              </div>
+            </div>
+          </div>
+          <a class="deal-spotlight-media" href="/producto.html?id=${heroDeal.id}">
+            <img src="${S.esc(S.img(heroDeal))}" alt="${S.esc(heroDeal.name)}">
+          </a>
+        </article>
+        ${subDeals.length ? `
+          <div class="deals-subgrid" id="dealsGrid">
+            ${subDeals.map(S.dealCard).join('')}
+          </div>
+        ` : ''}
+      </div>`;
+  }
+
+  /* 6. Sección Editorial / Colección (2 Bloques Amplios Editables) */
+  $('#editorial').innerHTML = `
+    <div class="section-header">
+      <div>
+        <span class="eyebrow">${S.esc(s.sec4Eyebrow || '04 / Diseño funcional')}</span>
+        <h2>${S.esc(s.sec4Title || 'Un estilo de vida')} <em>${S.esc(s.sec4Accent || 'digital.')}</em></h2>
+      </div>
+      <p>${S.esc(s.sec4Sub || 'Equipamiento pensado para integrarse con naturalidad a tu espacio de trabajo, estudio o viaje.')}</p>
+    </div>
+    <div class="editorial-grid">
+      <article class="editorial-card">
+        <img src="${S.esc(s.ed1Image || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1200&q=85')}" alt="${S.esc(s.ed1Title)}" loading="lazy">
+        <div>
+          <span class="eyebrow" style="color:rgba(255,255,255,0.75)">${S.esc(s.ed1Eyebrow || 'ACÚSTICA DE PRECISIÓN')}</span>
+          <h3>${S.esc(s.ed1Title || 'Tu espacio. Tu sonido.')}</h3>
+          <p>${S.esc(s.ed1Text || 'Aislamiento superior y fidelidad acústica para concentrarte en lo que importa.')}</p>
+        </div>
+        <div class="btn-row">
+          <a class="btn btn-accent" href="${S.esc(s.ed1Link || '/catalogo.html?cat=audio')}">${S.esc(s.ed1Btn || 'Explorar audio')} ${S.ico('arrowUpRight')}</a>
+        </div>
+      </article>
+      <article class="editorial-card">
+        <img src="${S.esc(s.ed2Image || 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=85')}" alt="${S.esc(s.ed2Title)}" loading="lazy">
+        <div>
+          <span class="eyebrow" style="color:rgba(255,255,255,0.75)">${S.esc(s.ed2Eyebrow || 'ESTACIÓN DE TRABAJO')}</span>
+          <h3>${S.esc(s.ed2Title || 'Todo listo. Adonde vayas.')}</h3>
+          <p>${S.esc(s.ed2Text || 'Conectividad multipuerto, carga rápida GaN y periféricos diseñados para rendir al máximo.')}</p>
+        </div>
+        <div class="btn-row">
+          <a class="btn btn-accent" href="${S.esc(s.ed2Link || '/catalogo.html?cat=setup')}">${S.esc(s.ed2Btn || 'Explorar productividad')} ${S.ico('arrowUpRight')}</a>
+        </div>
+      </article>
+    </div>`;
+
+  /* 7. Pasos de compra editables */
+  const steps = Array.isArray(s.steps) && s.steps.length ? s.steps : [
+    { num: 'PASO 01', title: 'Explora y selecciona', text: 'Navega por el catálogo, revisa especificaciones detalladas y agrega tus productos al pedido o guarda tus favoritos.' },
+    { num: 'PASO 02', title: 'Confirma por WhatsApp', text: 'Con un solo clic se genera el resumen de tu pedido o consulta directa hacia nuestro canal oficial de WhatsApp.' },
+    { num: 'PASO 03', title: 'Recibe tu pedido', text: 'Coordinamos el método de pago y el envío inmediato a tu domicilio o ciudad con seguimiento directo.' }
+  ];
+  $('#como-comprar').innerHTML = `
+    <div class="section-header">
+      <div>
+        <span class="eyebrow">${S.esc(s.stepsEyebrow || '05 / Experiencia directa')}</span>
+        <h2>${S.esc(s.stepsTitle || 'Compra simple en')} <em>${S.esc(s.stepsAccent || 'tres pasos.')}</em></h2>
+      </div>
+      <p>${S.esc(s.stepsSub || 'Sin registros complejos ni formularios interminables. Atención personalizada de principio a fin.')}</p>
+    </div>
+    <div class="steps">
+      ${steps.map(st => `
+        <div class="step">
+          <span class="step-num">${S.esc(st.num)}</span>
+          <h3>${S.esc(st.title)}</h3>
+          <p>${S.esc(st.text)}</p>
+        </div>
+      `).join('')}
+    </div>`;
+
+  /* 8. Bloque Final de Cierre */
+  $('#cta').innerHTML = `
+    <div class="promo">
+      <div>
+        <span class="eyebrow" style="color:var(--accent)">${S.esc(s.promoEyebrow || 'ATENCIÓN PERSONALIZADA')}</span>
+        <h2>${S.esc(s.promoTitle || '¿Buscas un producto o cotización especial?')}</h2>
+        <p>${S.esc(s.promoText || 'Escríbenos directamente a nuestro WhatsApp para enviarte disponibilidad inmediata, fotos reales y opciones de entrega.')}</p>
+      </div>
+      <div class="btn-row">
+        <a class="btn btn-wa btn-lg" href="${S.waLink('Hola, estoy buscando un producto y quisiera atención personalizada.')}" target="_blank" rel="noopener">${S.WA_SVG}<span>${S.esc(s.promoBtn1 || 'Comunicarse por WhatsApp')}</span></a>
+        <a class="btn btn-accent btn-lg" href="/catalogo.html">${S.esc(s.promoBtn2 || 'Ver catálogo completo')} ${S.ico('arrowUpRight')}</a>
+      </div>
+    </div>`;
+
+  const track = $('#homeGrid');
+  S.bindCards(track);
+  S.enableDragScroll(track);
+  $('#carPrev').onclick = () => track.scrollBy({ left: -480, behavior: 'smooth' });
+  $('#carNext').onclick = () => track.scrollBy({ left: 480, behavior: 'smooth' });
+  $('#homeShareCat').onclick = S.shareCatalog;
+
+  if ($('#dealsGrid')) S.bindCards($('#dealsGrid'));
+  $('#ofertas').addEventListener('click', e => {
+    const addDeal = e.target.closest('[data-add-deal]');
+    if (addDeal) S.addCart(addDeal.dataset.addDeal);
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,504 @@
+{
+  "settings": {
+    "storeName": "Vyra",
+    "currency": "Bs",
+    "whatsapp": "59170000000",
+    "announcement": "SELECCIÓN DE TECNOLOGÍA ESENCIAL · ENVÍOS A TODO EL PAÍS · ATENCIÓN DIRECTA",
+    "heroBadge": "CURADURÍA TECNOLÓGICA / VOL. 03",
+    "heroTitle": "Lo nuevo",
+    "heroAccent": "se siente.",
+    "heroText": "Tecnología que se integra a tu estilo. Objetos esenciales de diseño limpio, alto rendimiento y compra directa.",
+    "heroImage": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1200&q=85",
+    "heroCta": "Explorar catálogo",
+    "heroCta2": "Atención en línea",
+    "heroSide1Sub": "01 — SIEMPRE CONTIGO",
+    "heroSide1Title": "Conecta con lo que viene.",
+    "heroSide1Btn": "Ver colección",
+    "heroSide1Link": "/catalogo.html?cat=moviles",
+    "heroSide1Bg": "#e5e2f2",
+    "heroSide1Image": "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=900&q=85",
+    "heroSide2Sub": "02 — MÁS ENERGÍA",
+    "heroSide2Title": "Pequeño. Poderoso.",
+    "heroSide2Btn": "Ver colección",
+    "heroSide2Link": "/catalogo.html?cat=carga",
+    "heroSide2Bg": "#ebe5dc",
+    "heroSide2Image": "https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=900&q=85",
+    "sec1Eyebrow": "01 / Universos de producto",
+    "sec1Title": "Explora por",
+    "sec1Accent": "categoría.",
+    "sec2Eyebrow": "02 / Selección de la semana",
+    "sec2Title": "Piezas que",
+    "sec2Accent": "destacan.",
+    "sec3Eyebrow": "03 / Selección en tendencia",
+    "sec3Title": "Los más",
+    "sec3Accent": "destacados.",
+    "sec4Eyebrow": "04 / Diseño funcional",
+    "sec4Title": "Un estilo de vida",
+    "sec4Accent": "digital.",
+    "sec4Sub": "Equipamiento pensado para integrarse con naturalidad a tu espacio de trabajo, estudio o viaje.",
+    "ed1Eyebrow": "ACÚSTICA DE PRECISIÓN",
+    "ed1Title": "Tu espacio. Tu sonido.",
+    "ed1Text": "Aislamiento superior y fidelidad acústica para concentrarte en lo que importa.",
+    "ed1Btn": "Explorar audio",
+    "ed1Link": "/catalogo.html?cat=audio",
+    "ed1Image": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1200&q=85",
+    "ed2Eyebrow": "ESTACIÓN DE TRABAJO",
+    "ed2Title": "Todo listo. Adonde vayas.",
+    "ed2Text": "Conectividad multipuerto, carga rápida GaN y periféricos diseñados para rendir al máximo.",
+    "ed2Btn": "Explorar productividad",
+    "ed2Link": "/catalogo.html?cat=setup",
+    "ed2Image": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=85",
+    "stepsEyebrow": "05 / Experiencia directa",
+    "stepsTitle": "Compra simple en",
+    "stepsAccent": "tres pasos.",
+    "stepsSub": "Sin registros complejos ni formularios interminables. Atención personalizada de principio a fin.",
+    "steps": [
+      {
+        "num": "PASO 01",
+        "title": "Explora y selecciona",
+        "text": "Navega por el catálogo, revisa especificaciones detalladas y agrega tus productos al pedido o guarda tus favoritos."
+      },
+      {
+        "num": "PASO 02",
+        "title": "Confirma por WhatsApp",
+        "text": "Con un solo clic se genera el resumen de tu pedido o consulta directa hacia nuestro canal oficial de WhatsApp."
+      },
+      {
+        "num": "PASO 03",
+        "title": "Recibe tu pedido",
+        "text": "Coordinamos el método de pago y el envío inmediato a tu domicilio o ciudad con seguimiento directo."
+      }
+    ],
+    "promoEyebrow": "ATENCIÓN PERSONALIZADA",
+    "promoTitle": "¿Buscas un producto o cotización especial?",
+    "promoText": "Escríbenos directamente a nuestro WhatsApp para enviarte disponibilidad inmediata, fotos reales y opciones de entrega.",
+    "promoBtn1": "Comunicarse por WhatsApp",
+    "promoBtn2": "Ver catálogo completo",
+    "accent": "#d9f059",
+    "instagram": "",
+    "facebook": "",
+    "tiktok": "",
+    "address": "Bolivia · Envíos nacionales",
+    "footerText": "Objetos inteligentes para un mundo en movimiento. Curaduría de tecnología, audio, energía y productividad.",
+    "benefits": [
+      {
+        "icon": "bolt",
+        "title": "Atención inmediata",
+        "text": "Asesoría y pedidos en tiempo real por WhatsApp."
+      },
+      {
+        "icon": "shield",
+        "title": "Calidad verificada",
+        "text": "Productos seleccionados con garantía real."
+      },
+      {
+        "icon": "truck",
+        "title": "Envío seguro",
+        "text": "Entregas rápidas en tu ciudad y a todo el país."
+      },
+      {
+        "icon": "spark",
+        "title": "Diseño contemporáneo",
+        "text": "Piezas pensadas para durar y destacar."
+      }
+    ]
+  },
+  "categories": [
+    {
+      "cta": "Explorar",
+      "id": "audio",
+      "name": "Sonido",
+      "subtitle": "Haz que cada nota cuente.",
+      "image": "https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=1000&q=85"
+    },
+    {
+      "cta": "Explorar",
+      "id": "carga",
+      "name": "Energía",
+      "subtitle": "Potencia compacta sin límites.",
+      "image": "https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?auto=format&fit=crop&w=900&q=85"
+    },
+    {
+      "cta": "Explorar",
+      "id": "moviles",
+      "name": "Móvil",
+      "subtitle": "Siempre conectado.",
+      "image": "https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?auto=format&fit=crop&w=900&q=85"
+    },
+    {
+      "cta": "Explorar",
+      "id": "setup",
+      "name": "Productividad",
+      "subtitle": "Un mejor espacio. Un mejor día.",
+      "image": "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=1200&q=85"
+    }
+  ],
+  "products": [
+    {
+      "id": "1",
+      "images": [
+        "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1000&q=85",
+        "https://images.unsplash.com/photo-1583394838336-acd9777336f90?auto=format&fit=crop&w=1000&q=85"
+      ],
+      "specs": [
+        "Cancelación activa híbrida",
+        "Batería de 38 horas",
+        "Audio sin pérdida USB-C"
+      ],
+      "variants": [
+        "Negro Mate",
+        "Plata Lunar"
+      ],
+      "waCustom": "",
+      "stock": true,
+      "visible": true,
+      "featured": true,
+      "createdAt": 1793115271336,
+      "name": "Audífonos Studio Wireless ANC",
+      "sku": "VYR-AUD-01",
+      "brand": "SONIDO / ESTUDIO",
+      "cat": "audio",
+      "art": "headphone",
+      "price": 490,
+      "old": 590,
+      "badge": "Más buscado",
+      "desc": "Cancelación activa de ruido de alta precisión, transductores de 40 mm y hasta 38 horas de autonomía continua con carga rápida USB-C.",
+      "cost": 290
+    },
+    {
+      "id": "2",
+      "images": [
+        "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?auto=format&fit=crop&w=1000&q=85"
+      ],
+      "specs": [
+        "HDMI 4K 60Hz",
+        "Power Delivery 100W",
+        "Chasis de aluminio"
+      ],
+      "variants": [
+        "Gris Espacial"
+      ],
+      "waCustom": "",
+      "stock": true,
+      "visible": true,
+      "featured": true,
+      "createdAt": 1793115270336,
+      "name": "Hub Multipuerto USB-C 8 en 1 Pro",
+      "sku": "VYR-SET-02",
+      "brand": "SETUP / CONECTIVIDAD",
+      "cat": "setup",
+      "art": "hub",
+      "price": 329,
+      "old": null,
+      "badge": "Selección",
+      "desc": "Chasis de aluminio anodizado con salida HDMI 4K 60Hz, entrega de potencia PD 100W, lector SD/TF de alta velocidad y puertos USB 3.2.",
+      "cost": 185
+    },
+    {
+      "id": "3",
+      "images": [
+        "https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=1000&q=85"
+      ],
+      "specs": [
+        "Tecnología GaN II",
+        "3 puertos simultáneos",
+        "Protección térmica"
+      ],
+      "variants": [
+        "Grafito",
+        "Blanco Mate"
+      ],
+      "waCustom": "",
+      "stock": true,
+      "visible": true,
+      "featured": true,
+      "createdAt": 1793115269336,
+      "name": "Cargador Rápido GaN USB-C 65W",
+      "sku": "VYR-NRG-03",
+      "brand": "ENERGÍA / CARGA RÁPIDA",
+      "cat": "carga",
+      "art": "charger",
+      "price": 219,
+      "old": 259,
+      "badge": "Oferta",
+      "desc": "Tecnología de nitruro de galio (GaN) de última generación. Carga simultáneamente tu laptop, tablet y smartphone en un cuerpo ultracompacto.",
+      "cost": 120
+    },
+    {
+      "id": "4",
+      "images": [
+        "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1000&q=85",
+        "https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?auto=format&fit=crop&w=1000&q=85"
+      ],
+      "specs": [
+        "Pantalla OLED 120Hz",
+        "256 GB almacenamiento",
+        "Triple cámara 50 MP"
+      ],
+      "variants": [
+        "Titanio Oscuro",
+        "Arena"
+      ],
+      "waCustom": "",
+      "stock": true,
+      "visible": true,
+      "featured": true,
+      "createdAt": 1793115268336,
+      "name": "Smartphone Edge Pro 256 GB",
+      "sku": "VYR-MOV-04",
+      "brand": "MÓVIL / FLAGSHIP",
+      "cat": "moviles",
+      "art": "phone",
+      "price": 3890,
+      "old": 4250,
+      "badge": "Nuevo",
+      "desc": "Pantalla OLED de 120 Hz sin bordes, sistema triple de cámaras con sensor principal de 50 MP y acabado en cristal mate de alta resistencia.",
+      "cost": 2950
+    },
+    {
+      "id": "5",
+      "images": [
+        "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?auto=format&fit=crop&w=1000&q=85"
+      ],
+      "specs": [
+        "Estuche MagSafe",
+        "24h de autonomía total",
+        "Resistencia IPX4"
+      ],
+      "variants": [
+        "Blanco",
+        "Negro"
+      ],
+      "waCustom": "",
+      "stock": true,
+      "visible": true,
+      "featured": true,
+      "createdAt": 1793115267336,
+      "name": "Auriculares TWS Air Compact",
+      "sku": "VYR-AUD-05",
+      "brand": "SONIDO / INALÁMBRICO",
+      "cat": "audio",
+      "art": "earbuds",
+      "price": 289,
+      "old": 340,
+      "badge": "Destacado",
+      "desc": "Diseño ergonómico ultraligero con aislamiento acústico pasivo, micrófonos duales para llamadas claras y estuche de carga de bolsillo.",
+      "cost": 155
+    },
+    {
+      "id": "6",
+      "images": [
+        "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=1000&q=85"
+      ],
+      "specs": [
+        "Pantalla 14\" Retina",
+        "16 GB RAM / 512 GB SSD",
+        "Chasis unibody"
+      ],
+      "variants": [
+        "Plata",
+        "Gris Espacial"
+      ],
+      "waCustom": "",
+      "stock": true,
+      "visible": true,
+      "featured": false,
+      "createdAt": 1793115266336,
+      "name": "Laptop Ultrabook Studio 14\"",
+      "sku": "VYR-SET-06",
+      "brand": "SETUP / CÓMPUTO",
+      "cat": "setup",
+      "art": "laptop",
+      "price": 5490,
+      "old": null,
+      "badge": "Edición Pro",
+      "desc": "Arquitectura silenciosa de alto rendimiento, pantalla Retina calibrada de fábrica y batería para toda la jornada profesional.",
+      "cost": 4300
+    },
+    {
+      "id": "7",
+      "images": [
+        "https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?auto=format&fit=crop&w=1000&q=85"
+      ],
+      "specs": [
+        "Capacidad 10.000 mAh",
+        "Carga inalámbrica 15W",
+        "USB-C PD 20W"
+      ],
+      "variants": [
+        "Negro",
+        "Verde Salvia"
+      ],
+      "waCustom": "",
+      "stock": true,
+      "visible": true,
+      "featured": false,
+      "createdAt": 1793115265336,
+      "name": "Batería Magnética 10.000 mAh",
+      "sku": "VYR-NRG-07",
+      "brand": "ENERGÍA / PORTÁTIL",
+      "cat": "carga",
+      "art": "powerbank",
+      "price": 269,
+      "old": 315,
+      "badge": "Favorito",
+      "desc": "Acoplamiento magnético instantáneo y puerto bidireccional USB-C de 20W. Recarga segura sin cables en cualquier lugar.",
+      "cost": 145
+    },
+    {
+      "id": "8",
+      "images": [
+        "https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=1000&q=85"
+      ],
+      "specs": [
+        "Switches táctiles",
+        "Bluetooth 5.1 + USB-C",
+        "Aluminio CNC"
+      ],
+      "variants": [
+        "Antracita"
+      ],
+      "waCustom": "",
+      "stock": true,
+      "visible": true,
+      "featured": false,
+      "createdAt": 1793115264336,
+      "name": "Teclado Mecánico Low-Profile",
+      "sku": "VYR-SET-08",
+      "brand": "SETUP / PERIFÉRICOS",
+      "cat": "setup",
+      "art": "keyboard",
+      "price": 610,
+      "old": 690,
+      "badge": null,
+      "desc": "Switches táctiles silenciosos, estructura de aluminio mecanizado y conexión multipunto Bluetooth + receptor 2.4 GHz.",
+      "cost": 370
+    },
+    {
+      "id": "9",
+      "images": [
+        "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1000&q=85"
+      ],
+      "specs": [
+        "Cristal de zafiro",
+        "GPS multibanda",
+        "Sumergible 5 ATM"
+      ],
+      "variants": [
+        "Titanio Natural",
+        "Negro"
+      ],
+      "waCustom": "",
+      "stock": true,
+      "visible": true,
+      "featured": false,
+      "createdAt": 1793115263336,
+      "name": "Smartwatch Active Titanium",
+      "sku": "VYR-MOV-09",
+      "brand": "MÓVIL / WEARABLES",
+      "cat": "moviles",
+      "art": "watch",
+      "price": 685,
+      "old": 799,
+      "badge": "Oferta",
+      "desc": "Caja de aleación ligera con cristal de zafiro, monitoreo continuo de salud, GPS integrado y resistencia al agua 5 ATM.",
+      "cost": 410
+    },
+    {
+      "id": "10",
+      "images": [
+        "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?auto=format&fit=crop&w=1000&q=85"
+      ],
+      "specs": [
+        "Sonido 360 grados",
+        "Protección IP67",
+        "16 horas de música"
+      ],
+      "variants": [
+        "Carbón",
+        "Arena"
+      ],
+      "waCustom": "",
+      "stock": true,
+      "visible": true,
+      "featured": false,
+      "createdAt": 1793115262336,
+      "name": "Altavoz Acústico Bluetooth Mini",
+      "sku": "VYR-AUD-10",
+      "brand": "SONIDO / PORTÁTIL",
+      "cat": "audio",
+      "art": "speaker",
+      "price": 399,
+      "old": null,
+      "badge": null,
+      "desc": "Sonido omnidireccional de 360 grados con radiador pasivo de graves profundos y acabado textil impermeable.",
+      "cost": 220
+    },
+    {
+      "id": "11",
+      "images": [
+        "https://images.unsplash.com/photo-1585338107529-13afc5f02586?auto=format&fit=crop&w=1000&q=85"
+      ],
+      "specs": [
+        "Clavijas plegables",
+        "Ultradelgado 14mm",
+        "Carga rápida PD"
+      ],
+      "variants": [
+        "Gris Plata"
+      ],
+      "waCustom": "",
+      "stock": true,
+      "visible": true,
+      "featured": false,
+      "createdAt": 1793115261336,
+      "name": "Estación de Carga GaN de Viaje",
+      "sku": "VYR-NRG-11",
+      "brand": "ENERGÍA / VIAJES",
+      "cat": "carga",
+      "art": "charger",
+      "price": 189,
+      "old": 230,
+      "badge": null,
+      "desc": "Diseño ultradelgado con clavijas abatibles y protección térmica inteligente para viajes internacionales.",
+      "cost": 95
+    },
+    {
+      "id": "12",
+      "images": [
+        "https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=1000&q=85"
+      ],
+      "specs": [
+        "Ergonomía ajustable",
+        "7 puertos integrados",
+        "Soporta hasta 17\""
+      ],
+      "variants": [
+        "Plata",
+        "Negro"
+      ],
+      "waCustom": "",
+      "stock": true,
+      "visible": true,
+      "featured": false,
+      "createdAt": 1793115260336,
+      "name": "Soporte y Hub de Escritorio Pro",
+      "sku": "VYR-SET-12",
+      "brand": "SETUP / ESTACIÓN",
+      "cat": "setup",
+      "art": "hub",
+      "price": 449,
+      "old": 499,
+      "badge": "Edición Pro",
+      "desc": "Eleva tu estación de trabajo con conectividad completa integrada y gestión limpia de cables.",
+      "cost": 260
+    }
+  ],
+  "admin": {
+    "password": "b82588468bdbc270c5038a226164c28d:22649e0f49cac981853a1a3f1b2ebe2b51753ef9d96331747b5b9c9815ad03de",
+    "defaultPassword": true
+  },
+  "sessions": {
+    "83716be303d50a3cf20ddf00647e222feff7413a3d9ab2b4": 1793720255927
+  }
+}

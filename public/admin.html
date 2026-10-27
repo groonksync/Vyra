@@ -1,0 +1,1804 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Vyra</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+body { background: var(--bg); }
+[hidden] { display: none !important; }
+
+/* Login limpio sin trazos */
+.login { min-height: 100dvh; display: grid; place-items: center; padding: 20px; }
+.box { background: var(--paper); border-radius: var(--r-xl); padding: 42px; width: min(420px, 100%); box-shadow: var(--shadow); }
+.box h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.04em; margin: 18px 0 6px; }
+.box p { color: var(--muted); font-size: 13px; margin: 0 0 24px; }
+
+/* Campos de formulario sin bordes */
+.f { display: grid; gap: 6px; margin-bottom: 14px; }
+.f label { font-size: 12px; font-weight: 700; color: var(--ink); display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.f input, .f select, .f textarea {
+  border: 0;
+  background: var(--surface);
+  border-radius: var(--r-sm);
+  padding: 11px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  outline: none;
+  width: 100%;
+  transition: background 0.18s ease;
+}
+.f input:focus, .f select:focus, .f textarea:focus { background: var(--tile); }
+.f textarea { min-height: 88px; resize: vertical; line-height: 1.55; }
+.f small { color: var(--muted); font-size: 11px; font-weight: 500; }
+.err { color: var(--danger); font-size: 12px; font-weight: 600; min-height: 18px; margin-bottom: 8px; }
+
+/* Layout a ancho completo sin trazos */
+.app { display: grid; grid-template-columns: 256px 1fr; min-height: 100dvh; }
+.side {
+  background: var(--paper);
+  padding: 24px 16px;
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.side .brand { padding: 4px 12px 20px; font-size: 26px; }
+.side-group { font-size: 10px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); padding: 10px 12px 4px; }
+.tab {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  height: 42px;
+  padding: 0 14px;
+  border-radius: var(--r-sm);
+  border: 0;
+  background: transparent;
+  font-weight: 700;
+  font-size: 13px;
+  text-align: left;
+  color: var(--muted);
+  transition: background 0.18s ease, color 0.18s ease;
+}
+.tab:hover { background: var(--surface); color: var(--ink); }
+.tab.on { background: var(--ink); color: var(--bg); }
+.side .sp { flex: 1; }
+
+.content {
+  padding: clamp(20px, 2.2vw, 34px);
+  width: 100%;
+  max-width: 100%;
+}
+
+.head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.head h1 { font-size: clamp(26px, 2.8vw, 36px); font-weight: 800; letter-spacing: -0.045em; }
+.head p { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+/* Tarjetas de métricas superiores */
+.stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 16px; }
+.stat { background: var(--paper); border-radius: var(--r-lg); padding: 18px 20px; }
+.stat b { font-size: 28px; font-weight: 800; letter-spacing: -0.04em; display: block; line-height: 1.1; }
+.stat span { font-size: 12px; font-weight: 600; color: var(--muted); margin-top: 4px; display: block; }
+.stat.accent { background: var(--accent); color: var(--accent-ink); }
+.stat.accent span { color: var(--accent-ink); opacity: 0.78; }
+
+/* Bloques y paneles */
+.panel { background: var(--paper); border-radius: var(--r-xl); padding: 26px; margin-bottom: 16px; }
+.panel h2 { font-size: 19px; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 4px; }
+.panel-sub { font-size: 13px; color: var(--muted); margin-bottom: 18px; }
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.cols-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+
+/* Barra de control del catálogo */
+.adm-toolbar {
+  background: var(--paper);
+  border-radius: var(--r-lg);
+  padding: 16px 18px;
+  margin-bottom: 14px;
+  display: grid;
+  gap: 12px;
+}
+.adm-toolbar-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.adm-bulk {
+  background: var(--surface);
+  border-radius: var(--r-md);
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.adm-bulk strong { font-size: 11px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+
+/* NUEVA VISTA 1: Galería Estudio (Showcase Editorial Limpio) */
+.studio-showcase {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: 16px;
+}
+.sc-card {
+  background: var(--paper);
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+.sc-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+.sc-media {
+  aspect-ratio: 16 / 10;
+  background: var(--tile);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+.sc-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 0.45s ease;
+}
+.sc-media img.real { object-fit: cover; }
+.sc-card:hover .sc-media img { transform: scale(1.04); }
+.sc-float-left {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.sc-float-right {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  display: flex;
+  gap: 6px;
+}
+.sc-pill {
+  background: rgba(18, 21, 19, 0.78);
+  color: #fff;
+  backdrop-filter: blur(8px);
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.sc-pill.lime { background: var(--accent); color: var(--accent-ink); }
+.sc-pill.red { background: var(--danger); color: #fff; }
+.sc-pill.green { background: var(--wa-solid); color: #fff; }
+.sc-body {
+  padding: 18px 20px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+.sc-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.sc-title {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.28;
+}
+.sc-specs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.sc-specs span {
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 9px;
+  border-radius: 6px;
+}
+.sc-pricing-bar {
+  margin-top: auto;
+  background: var(--surface);
+  border-radius: var(--r-md);
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.sc-price-main {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+.sc-price-main s {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 500;
+  margin-left: 6px;
+}
+.sc-margin {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--wa-solid);
+  display: block;
+}
+.sc-footer {
+  padding: 0 20px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.sc-footer .btn-sm { flex: 1; }
+
+/* VISTA 2: Lista Ejecutiva */
+.plist { display: grid; gap: 10px; }
+.prow {
+  background: var(--paper);
+  border-radius: var(--r-lg);
+  padding: 14px 18px;
+  display: grid;
+  grid-template-columns: 68px 1.4fr 1fr auto;
+  gap: 16px;
+  align-items: center;
+}
+.prow img { width: 68px; height: 68px; border-radius: var(--r-sm); background: var(--tile); object-fit: contain; }
+.prow img.real { object-fit: cover; }
+.prow strong { font-size: 14px; font-weight: 700; display: block; }
+.prow small { color: var(--muted); font-size: 12px; }
+.tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+.tag { font-size: 10px; font-weight: 700; padding: 4px 9px; border-radius: 6px; background: var(--surface); letter-spacing: 0.04em; text-transform: uppercase; }
+.tag.g { background: rgba(21, 153, 82, 0.14); color: var(--wa-solid); }
+.tag.r { background: rgba(217, 56, 56, 0.14); color: var(--danger); }
+.tag.y { background: var(--accent); color: var(--accent-ink); }
+.rbtns { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; justify-content: flex-end; }
+
+/* NUEVA VISTA 3: Matriz Rápida de Inventario y Precios */
+.matrix-wrap {
+  background: var(--paper);
+  border-radius: var(--r-xl);
+  padding: 16px;
+  overflow-x: auto;
+}
+.matrix-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 8px;
+  min-width: 860px;
+}
+.matrix-table th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  padding: 6px 12px;
+}
+.matrix-table td {
+  background: var(--surface);
+  padding: 10px 12px;
+  font-size: 13px;
+}
+.matrix-table tr td:first-child { border-radius: var(--r-sm) 0 0 var(--r-sm); }
+.matrix-table tr td:last-child { border-radius: 0 var(--r-sm) var(--r-sm) 0; }
+.matrix-input {
+  background: var(--paper);
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  width: 100%;
+}
+
+/* Galería en el Editor */
+.imgs { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.im { width: 92px; height: 92px; border-radius: var(--r-sm); position: relative; overflow: hidden; background: var(--tile); cursor: pointer; }
+.im img { width: 100%; height: 100%; object-fit: cover; }
+.im button { position: absolute; top: 4px; right: 4px; width: 24px; height: 24px; border-radius: 6px; border: 0; background: rgba(0,0,0,0.75); color: #fff; font-weight: 700; }
+.im i { position: absolute; left: 4px; bottom: 4px; font-size: 9px; font-style: normal; background: var(--accent); color: var(--accent-ink); padding: 2px 6px; border-radius: 4px; font-weight: 800; }
+.upload { width: 92px; height: 92px; background: var(--surface); border-radius: var(--r-sm); display: grid; place-items: center; font-size: 11px; color: var(--muted); text-align: center; cursor: pointer; font-weight: 700; }
+.upload:hover { background: var(--tile); color: var(--ink); }
+
+/* Modal Estudio de Producto (2 Columnas) */
+.modal.studio { width: min(1020px, calc(100% - 28px)); padding: 30px; }
+.studio-grid { display: grid; grid-template-columns: 1fr 1.15fr; gap: 24px; align-items: start; }
+.studio-box { background: var(--surface); border-radius: var(--r-lg); padding: 18px; margin-bottom: 14px; }
+.studio-box .f input, .studio-box .f select, .studio-box .f textarea { background: var(--paper); }
+.sw { display: flex; gap: 12px; flex-wrap: wrap; margin: 8px 0 4px; }
+.sw label { display: flex; gap: 8px; align-items: center; font-size: 13px; font-weight: 700; background: var(--paper); padding: 8px 12px; border-radius: var(--r-sm); cursor: pointer; }
+.quick { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0 10px; }
+
+/* Tarjetas visuales de Categorías y Bento */
+.cat-cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
+.cat-edit-card { background: var(--paper); border-radius: var(--r-xl); padding: 20px; display: grid; gap: 12px; }
+.cat-edit-card img { width: 100%; height: 170px; object-fit: cover; border-radius: var(--r-md); background: var(--tile); }
+.cat-edit-card input { background: var(--surface); border-radius: var(--r-sm); padding: 10px 12px; font-size: 13px; width: 100%; }
+
+.herop { width: 140px; height: 96px; border-radius: var(--r-md); background: var(--tile); object-fit: cover; flex-shrink: 0; }
+.swatch-bar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.swatch { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; transition: transform 0.15s ease; }
+.swatch:hover { transform: scale(1.12); }
+
+/* Sub-pestañas para el editor del sitio y marketing */
+.subtabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  background: var(--paper);
+  padding: 10px;
+  border-radius: var(--r-lg);
+  margin-bottom: 16px;
+}
+
+.copy-card {
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.copy-card pre {
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: var(--font);
+  font-size: 13px;
+  line-height: 1.55;
+  background: var(--paper);
+  padding: 14px;
+  border-radius: var(--r-sm);
+}
+
+.mbar { display: none; }
+@media (max-width: 980px) {
+  .app { grid-template-columns: 1fr; }
+  .side { display: none; }
+  .content { padding: 18px 14px 90px; }
+  .mbar { display: flex; position: fixed; bottom: 0; left: 0; right: 0; background: var(--paper); z-index: 50; padding: 6px 6px calc(6px + env(safe-area-inset-bottom)); gap: 4px; box-shadow: var(--shadow); }
+  .mbar button { flex: 1; border: 0; background: none; height: 42px; font-size: 11px; font-weight: 700; border-radius: var(--r-sm); }
+  .mbar button.on { background: var(--ink); color: var(--bg); }
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .cols, .cols-3, .studio-grid { grid-template-columns: 1fr; }
+  .prow { grid-template-columns: 56px 1fr; }
+  .rbtns { grid-column: 1 / -1; justify-content: flex-start; }
+}
+</style>
+</head>
+<body>
+<div class="login" id="login">
+  <form class="box" id="loginForm">
+    <span class="brand"><span class="brand-mark"></span>vyra<i>.</i></span>
+    <h1>Administración privada</h1>
+    <p>Ingresa tu clave para gestionar tu catálogo, precios, promociones y diseño del sitio.</p>
+    <div class="f">
+      <label for="pw">Contraseña de administrador</label>
+      <input id="pw" type="password" value="admin123" autocomplete="current-password" required autofocus>
+      <small>Clave actual configurada: <strong>admin123</strong></small>
+    </div>
+    <div class="err" id="loginErr"></div>
+    <button type="submit" class="btn btn-dark btn-block">Ingresar al panel</button>
+  </form>
+</div>
+
+<div class="app" id="app" hidden>
+  <aside class="side">
+    <span class="brand"><span class="brand-mark"></span>panel<i>.</i></span>
+    <div class="side-group">Gestión principal</div>
+    <button class="tab on" data-t="products">Catálogo e inventario</button>
+    <button class="tab" data-t="site">Diseño y portada web</button>
+    <button class="tab" data-t="cats">Categorías y mosaico</button>
+    <div class="side-group">Crecimiento comercial</div>
+    <button class="tab" data-t="tools">Marketing y ventas</button>
+    <button class="tab" data-t="sec">Seguridad de acceso</button>
+    <div class="sp"></div>
+    <a class="tab" href="/" target="_blank">Abrir tienda pública</a>
+    <a class="tab" href="/catalogo.html" target="_blank">Abrir panel catálogo</a>
+    <button class="tab" id="logout">Cerrar sesión</button>
+  </aside>
+  <main class="content" id="view"></main>
+</div>
+
+<nav class="mbar" id="mbar">
+  <button class="on" data-t="products">Catálogo</button>
+  <button data-t="site">Diseño</button>
+  <button data-t="cats">Categorías</button>
+  <button data-t="tools">Marketing</button>
+  <button data-t="sec">Clave</button>
+</nav>
+
+<div class="overlay" id="overlay"></div>
+<div class="modal studio" id="editor" role="dialog" aria-label="Estudio de producto"></div>
+<input type="file" id="globalFile" accept="image/*" hidden>
+<div class="toast" id="toast"></div>
+<script src="/js/art.js"></script>
+<script>
+(() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  let token = localStorage.getItem('adm_token');
+  let D = null;
+  let tab = 'products';
+  let siteSubTab = 'portada';
+  let mktSubTab = 'copys';
+  let editing = null;
+  let q = '';
+  let stateFilter = 'all';
+  let catFilter = 'all';
+  let sortMode = 'recent';
+  let viewMode = 'showcase';
+
+  const toast = m => {
+    const t = $('#toast');
+    t.textContent = m;
+    t.classList.add('on');
+    clearTimeout(toast.t);
+    toast.t = setTimeout(() => t.classList.remove('on'), 2400);
+  };
+
+  async function api(method, url, body) {
+    const r = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
+      body: body ? JSON.stringify(body) : undefined
+    });
+    const d = await r.json().catch(() => ({}));
+    if (r.status === 401 && url !== '/api/login') {
+      token = null;
+      localStorage.removeItem('adm_token');
+      $('#login').hidden = false;
+      $('#app').hidden = true;
+      throw new Error('Sesión expirada');
+    }
+    if (!r.ok) throw new Error(d.error || 'Error en la solicitud');
+    return d;
+  }
+
+  const logout = async (silent) => {
+    if (!silent && token) try { await api('POST', '/api/admin/logout'); } catch {}
+    token = null;
+    localStorage.removeItem('adm_token');
+    sessionStorage.setItem('manual_logout', '1');
+    $('#login').hidden = false;
+    $('#app').hidden = true;
+  };
+
+  async function doLogin(pwValue) {
+    $('#loginErr').textContent = '';
+    try {
+      const d = await api('POST', '/api/login', { password: pwValue.trim() });
+      token = d.token;
+      localStorage.setItem('adm_token', token);
+      sessionStorage.removeItem('manual_logout');
+      await boot();
+    } catch (x) {
+      $('#loginErr').textContent = x.message;
+    }
+  }
+
+  $('#loginForm').onsubmit = async e => {
+    e.preventDefault();
+    await doLogin($('#pw').value);
+  };
+
+  async function boot() {
+    try {
+      D = await api('GET', '/api/admin/store');
+    } catch {
+      return;
+    }
+    $('#login').hidden = true;
+    $('#app').hidden = false;
+    render();
+  }
+
+  const price = n => `${D.settings.currency} ${Number(n || 0).toLocaleString('es-BO')}`;
+  const catName = id => (D.categories.find(c => c.id === id) || {}).name || 'Sin categoría';
+  const pct = p => p.old && p.old > p.price ? Math.round((1 - p.price / p.old) * 100) : 0;
+
+  function pickAndUpload(cb, max = 1500) {
+    const gf = $('#globalFile');
+    gf.onchange = async ev => {
+      const f = ev.target.files[0];
+      ev.target.value = '';
+      if (!f) return;
+      try {
+        toast('Procesando y subiendo imagen...');
+        const data = await shrink(f, max);
+        const r = await api('POST', '/api/admin/upload', { data });
+        cb(r.url);
+      } catch (x) {
+        toast(x.message);
+      }
+    };
+    gf.click();
+  }
+
+  function render() {
+    $$('[data-t]').forEach(b => b.classList.toggle('on', b.dataset.t === tab));
+    ({ products: vProducts, site: vSite, cats: vCats, tools: vTools, sec: vSec })[tab]();
+  }
+
+  /* =========================================================================
+     1. CATÁLOGO E INVENTARIO (Galería Estudio + Lista Ejecutiva + Matriz Rápida)
+     ========================================================================= */
+  function vProducts() {
+    const P = D.products;
+    let list = P.filter(p => {
+      if (stateFilter === 'visible' && !p.visible) return false;
+      if (stateFilter === 'hidden' && p.visible) return false;
+      if (stateFilter === 'sale' && !(p.old > p.price)) return false;
+      if (stateFilter === 'featured' && !p.featured) return false;
+      if (stateFilter === 'out' && p.stock) return false;
+      if (catFilter !== 'all' && p.cat !== catFilter) return false;
+      return !q || `${p.name} ${p.sku || ''} ${p.brand} ${catName(p.cat)}`.toLowerCase().includes(q);
+    });
+
+    list.sort((a, b) =>
+      sortMode === 'price_asc' ? a.price - b.price :
+      sortMode === 'price_desc' ? b.price - a.price :
+      sortMode === 'name' ? a.name.localeCompare(b.name) :
+      sortMode === 'discount' ? pct(b) - pct(a) :
+      (b.createdAt || 0) - (a.createdAt || 0)
+    );
+
+    const totalProfit = P.reduce((sum, p) => sum + (p.cost > 0 ? Math.max(0, p.price - p.cost) : 0), 0);
+
+    $('#view').innerHTML = `
+      <div class="head">
+        <div>
+          <h1>Catálogo e inventario</h1>
+          <p>Gestiona tus productos con vista de Galería Estudio, Lista Ejecutiva o Matriz de Edición Rápida.</p>
+        </div>
+        <div class="btn-row">
+          <a class="btn btn-ghost btn-sm" href="/catalogo.html" target="_blank">Ver catálogo público</a>
+          <button class="btn btn-dark" id="newP">+ Agregar nuevo producto</button>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><b>${P.length}</b><span>Productos registrados</span></div>
+        <div class="stat"><b>${P.filter(p => p.visible).length}</b><span>Visibles en tienda</span></div>
+        <div class="stat accent"><b>${P.filter(p => p.old > p.price).length}</b><span>Con oferta activa</span></div>
+        <div class="stat"><b>${P.filter(p => p.featured).length}</b><span>En carrusel destacados</span></div>
+        <div class="stat"><b>${price(totalProfit)}</b><span>Margen unitario acumulado</span></div>
+      </div>
+
+      <div class="adm-toolbar">
+        <div class="adm-toolbar-row">
+          <div class="filters" id="stateChips">
+            ${[
+              ['all', 'Todos', P.length],
+              ['visible', 'Visibles', P.filter(p => p.visible).length],
+              ['sale', 'En oferta', P.filter(p => p.old > p.price).length],
+              ['featured', 'Destacados', P.filter(p => p.featured).length],
+              ['out', 'Agotados', P.filter(p => !p.stock).length],
+              ['hidden', 'Ocultos', P.filter(p => !p.visible).length]
+            ].map(([k, l, n]) => `<button class="chip ${stateFilter === k ? 'active' : ''}" data-sf="${k}"><span>${l}</span><b>${n}</b></button>`).join('')}
+          </div>
+          <div class="btn-row">
+            <input class="search" id="pq" type="search" placeholder="Buscar por nombre o código..." value="${esc(q)}">
+            <select class="select" id="catSel">
+              <option value="all">Todas las categorías</option>
+              ${D.categories.map(c => `<option value="${c.id}" ${catFilter === c.id ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}
+            </select>
+            <select class="select" id="sortSel">
+              <option value="recent" ${sortMode === 'recent' ? 'selected' : ''}>Más recientes</option>
+              <option value="price_asc" ${sortMode === 'price_asc' ? 'selected' : ''}>Precio: menor a mayor</option>
+              <option value="price_desc" ${sortMode === 'price_desc' ? 'selected' : ''}>Precio: mayor a menor</option>
+              <option value="discount" ${sortMode === 'discount' ? 'selected' : ''}>Mayor descuento</option>
+              <option value="name" ${sortMode === 'name' ? 'selected' : ''}>Nombre A–Z</option>
+            </select>
+            <div class="btn-row" style="gap:4px">
+              <button class="chip ${viewMode === 'showcase' ? 'active' : ''}" id="vShowcase">Galería Estudio</button>
+              <button class="chip ${viewMode === 'list' ? 'active' : ''}" id="vList">Lista</button>
+              <button class="chip ${viewMode === 'matrix' ? 'active' : ''}" id="vMatrix">Matriz rápida</button>
+            </div>
+          </div>
+        </div>
+        <div class="adm-bulk">
+          <strong>Promociones en lote (${catFilter === 'all' ? 'Todo el catálogo' : 'Categoría: ' + esc(catName(catFilter))})</strong>
+          <div class="btn-row">
+            <button class="btn btn-ghost btn-sm" data-bulk="discount" data-val="50">Mitad de precio (-50%)</button>
+            <button class="btn btn-ghost btn-sm" data-bulk="discount" data-val="30">Oferta -30%</button>
+            <button class="btn btn-ghost btn-sm" data-bulk="discount" data-val="20">Oferta -20%</button>
+            <button class="btn btn-ghost btn-sm" data-bulk="restore">Restaurar precios normales</button>
+            <button class="btn btn-ghost btn-sm" data-bulk="feature_all">Destacar todos</button>
+            <button class="btn btn-ghost btn-sm" data-bulk="stock_in">Todos disponibles</button>
+          </div>
+        </div>
+      </div>
+
+      ${viewMode === 'showcase' ? `
+        <div class="studio-showcase" id="pContainer">
+          ${list.map(p => {
+            const off = pct(p);
+            const profit = p.cost > 0 ? p.price - p.cost : null;
+            return `
+            <article class="sc-card">
+              <div class="sc-media" data-a="edit" data-id="${p.id}" title="Clic para abrir el editor completo">
+                <img class="${p.images[0] ? 'real' : ''}" src="${esc(p.images[0] || VyraArt(p.art))}" alt="${esc(p.name)}">
+                <div class="sc-float-left">
+                  <span class="sc-pill">${esc(catName(p.cat))}</span>
+                  ${p.featured ? '<span class="sc-pill lime">Destacado</span>' : ''}
+                </div>
+                <div class="sc-float-right">
+                  ${off ? `<span class="sc-pill red">-${off}%</span>` : ''}
+                  ${p.stock ? '<span class="sc-pill green">Stock</span>' : '<span class="sc-pill red">Agotado</span>'}
+                </div>
+              </div>
+              <div class="sc-body">
+                <div class="sc-meta">
+                  <span>${esc(p.sku || 'SIN SKU')}</span>
+                  <span>${p.visible ? 'Público' : 'Oculto'}</span>
+                </div>
+                <div class="sc-title">${esc(p.name)}</div>
+                ${(p.specs && p.specs.length) ? `<div class="sc-specs">${p.specs.slice(0, 3).map(sp => `<span>${esc(sp)}</span>`).join('')}</div>` : ''}
+                <div class="sc-pricing-bar">
+                  <div>
+                    <div class="sc-price-main">${price(p.price)}${off ? `<s>${price(p.old)}</s>` : ''}</div>
+                    ${profit !== null ? `<span class="sc-margin">Ganancia: ${price(profit)} (${Math.round(profit / p.price * 100)}%)</span>` : '<span class="sc-margin" style="color:var(--muted)">Sin costo registrado</span>'}
+                  </div>
+                  <div class="btn-row" style="gap:6px">
+                    <button class="btn btn-ghost btn-sm" data-a="half" data-id="${p.id}" style="height:34px;padding:0 10px">${off ? 'Normal' : '-50%'}</button>
+                    <button class="btn btn-ghost btn-sm" data-a="feat" data-id="${p.id}" style="height:34px;padding:0 10px">${p.featured ? 'Quitar inicio' : 'Destacar'}</button>
+                  </div>
+                </div>
+              </div>
+              <div class="sc-footer">
+                <button class="btn btn-dark btn-sm" data-a="edit" data-id="${p.id}">Editar producto</button>
+                <button class="btn btn-ghost btn-sm" data-a="vis" data-id="${p.id}">${p.visible ? 'Ocultar' : 'Mostrar'}</button>
+                <button class="btn btn-ghost btn-sm" data-a="link" data-id="${p.id}">Link</button>
+                <button class="btn btn-ghost btn-sm" style="color:var(--danger);flex:0;padding:0 12px" data-a="del" data-id="${p.id}" title="Eliminar">×</button>
+              </div>
+            </article>`;
+          }).join('') || '<div class="empty">No hay productos que coincidan con la búsqueda.</div>'}
+        </div>
+      ` : viewMode === 'list' ? `
+        <div class="plist" id="pContainer">
+          ${list.map(p => {
+            const off = pct(p);
+            return `
+            <div class="prow">
+              <img class="${p.images[0] ? 'real' : ''}" src="${esc(p.images[0] || VyraArt(p.art))}" alt="">
+              <div>
+                <strong>${esc(p.name)}</strong>
+                <small>${esc(catName(p.cat))}${p.sku ? ` · Código: ${esc(p.sku)}` : ''}</small>
+                <div class="tags">
+                  ${p.visible ? '<span class="tag g">Visible</span>' : '<span class="tag">Oculto</span>'}
+                  ${p.stock ? '' : '<span class="tag r">Agotado</span>'}
+                  ${off ? `<span class="tag y">Oferta -${off}%</span>` : ''}
+                  ${p.featured ? '<span class="tag y">Destacado</span>' : ''}
+                </div>
+              </div>
+              <div>
+                <strong style="font-size:16px">${price(p.price)}</strong>
+                ${off ? `<small><s>${price(p.old)}</s></small>` : ''}
+              </div>
+              <div class="rbtns">
+                <button class="btn btn-ghost btn-sm" data-a="half" data-id="${p.id}">${off ? 'Precio normal' : 'Mitad de precio'}</button>
+                <button class="btn btn-ghost btn-sm" data-a="feat" data-id="${p.id}">${p.featured ? 'Quitar de inicio' : 'Destacar'}</button>
+                <button class="btn btn-ghost btn-sm" data-a="vis" data-id="${p.id}">${p.visible ? 'Ocultar' : 'Mostrar'}</button>
+                <button class="btn btn-dark btn-sm" data-a="edit" data-id="${p.id}">Editar</button>
+                <button class="btn btn-ghost btn-sm" data-a="dup" data-id="${p.id}">Duplicar</button>
+                <button class="btn btn-ghost btn-sm" style="color:var(--danger)" data-a="del" data-id="${p.id}">Eliminar</button>
+              </div>
+            </div>`;
+          }).join('') || '<div class="empty">No hay productos que coincidan con la búsqueda.</div>'}
+        </div>
+      ` : `
+        <div class="matrix-wrap" id="pContainer">
+          <table class="matrix-table">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>SKU</th>
+                <th>Categoría</th>
+                <th>Costo (${esc(D.settings.currency)})</th>
+                <th>Precio venta</th>
+                <th>Precio anterior</th>
+                <th>Opciones rápidas</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${list.map(p => `
+                <tr data-row="${p.id}">
+                  <td><input class="matrix-input" data-field="name" value="${esc(p.name)}"></td>
+                  <td style="width:120px"><input class="matrix-input" data-field="sku" value="${esc(p.sku || '')}"></td>
+                  <td style="width:150px">
+                    <select class="matrix-input" data-field="cat">
+                      ${D.categories.map(c => `<option value="${c.id}" ${c.id === p.cat ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}
+                    </select>
+                  </td>
+                  <td style="width:110px"><input class="matrix-input" type="number" step="0.01" data-field="cost" value="${p.cost || 0}"></td>
+                  <td style="width:110px"><input class="matrix-input" type="number" step="0.01" data-field="price" value="${p.price}"></td>
+                  <td style="width:110px"><input class="matrix-input" type="number" step="0.01" data-field="old" value="${p.old || ''}" placeholder="—"></td>
+                  <td>
+                    <div class="btn-row" style="gap:6px;flex-wrap:nowrap">
+                      <button class="btn btn-ghost btn-sm" data-a="stock" data-id="${p.id}">${p.stock ? 'En stock' : 'Agotado'}</button>
+                      <button class="btn btn-ghost btn-sm" data-a="feat" data-id="${p.id}">${p.featured ? 'Destacado' : 'Normal'}</button>
+                      <button class="btn btn-dark btn-sm" data-a="edit" data-id="${p.id}">Ficha</button>
+                    </div>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `}`;
+
+    $('#newP').onclick = () => openEditor(null);
+    $('#vShowcase').onclick = () => { viewMode = 'showcase'; vProducts(); };
+    $('#vList').onclick = () => { viewMode = 'list'; vProducts(); };
+    $('#vMatrix').onclick = () => { viewMode = 'matrix'; vProducts(); };
+    $('#catSel').onchange = e => { catFilter = e.target.value; vProducts(); };
+    $('#sortSel').onchange = e => { sortMode = e.target.value; vProducts(); };
+    $('#stateChips').onclick = e => {
+      const b = e.target.closest('[data-sf]');
+      if (!b) return;
+      stateFilter = b.dataset.sf;
+      vProducts();
+    };
+    $('#pq').oninput = e => {
+      q = e.target.value.toLowerCase();
+      const pos = e.target.selectionStart;
+      vProducts();
+      const i = $('#pq');
+      i.focus();
+      i.setSelectionRange(pos, pos);
+    };
+
+    $$('[data-bulk]').forEach(btn => btn.onclick = async () => {
+      const action = btn.dataset.bulk;
+      const value = Number(btn.dataset.val || 0);
+      const scopeLabel = catFilter === 'all' ? 'todos los productos' : `la categoría "${catName(catFilter)}"`;
+      if (!confirm(`¿Aplicar esta acción a ${scopeLabel}?`)) return;
+      try {
+        const res = await api('POST', '/api/admin/bulk', { action, value, cat: catFilter === 'all' ? '' : catFilter });
+        D.products = res.products;
+        toast('Acción masiva aplicada');
+        vProducts();
+      } catch (x) { toast(x.message); }
+    });
+
+    $('#pContainer').onchange = async e => {
+      const tr = e.target.closest('[data-row]');
+      if (tr && e.target.dataset.field) {
+        const p = D.products.find(x => x.id === tr.dataset.row);
+        const f = e.target.dataset.field;
+        const val = ['price', 'old', 'cost'].includes(f) ? (e.target.value === '' ? null : Number(e.target.value)) : e.target.value;
+        await save(p, { [f]: val });
+        toast('Cambio guardado');
+      }
+    };
+
+    $('#pContainer').onclick = async e => {
+      const b = e.target.closest('[data-a]');
+      if (!b) return;
+      const p = D.products.find(x => x.id === b.dataset.id);
+      const a = b.dataset.a;
+      try {
+        if (a === 'edit') return openEditor(p);
+        if (a === 'vis') { await save(p, { visible: !p.visible }); toast(p.visible ? 'Producto visible' : 'Producto oculto'); }
+        if (a === 'feat') { await save(p, { featured: !p.featured }); toast(p.featured ? 'Agregado a destacados' : 'Quitado de destacados'); }
+        if (a === 'stock') { await save(p, { stock: !p.stock }); toast(p.stock ? 'Marcado en stock' : 'Marcado agotado'); }
+        if (a === 'link') {
+          const url = `${location.origin}/producto.html?id=${p.id}`;
+          await navigator.clipboard.writeText(url);
+          toast('Enlace del producto copiado');
+        }
+        if (a === 'half') {
+          if (p.old > p.price) await save(p, { price: p.old, old: null });
+          else await save(p, { old: p.price, price: Math.round(p.price / 2 * 100) / 100 });
+          toast('Precio actualizado');
+        }
+        if (a === 'dup') {
+          const c = await api('POST', '/api/admin/products', { ...p, name: p.name + ' (Copia)', visible: false });
+          D.products.unshift(c);
+          toast('Producto duplicado');
+          vProducts();
+        }
+        if (a === 'del' && confirm(`¿Eliminar "${p.name}" del catálogo?`)) {
+          await api('DELETE', '/api/admin/products/' + p.id);
+          D.products = D.products.filter(x => x.id !== p.id);
+          toast('Producto eliminado');
+          vProducts();
+        }
+      } catch (x) { toast(x.message); }
+    };
+  }
+
+  async function save(p, patch) {
+    const n = await api('PUT', '/api/admin/products/' + p.id, { ...p, ...patch });
+    Object.assign(p, n);
+    vProducts();
+  }
+
+  /* ---------- Estudio de Edición de Producto (2 Columnas) ---------- */
+  const ARTS = { headphone: 'Audífonos', earbuds: 'Auriculares', speaker: 'Altavoz', charger: 'Cargador', powerbank: 'Batería', hub: 'Hub USB-C', phone: 'Smartphone', watch: 'Smartwatch', laptop: 'Laptop', keyboard: 'Teclado' };
+  function openEditor(p) {
+    editing = p
+      ? { ...p, images: [...(p.images || [])], specs: [...(p.specs || [])], variants: [...(p.variants || [])] }
+      : { name: '', sku: '', cat: D.categories[0]?.id || '', brand: '', desc: '', price: '', old: '', cost: '', badge: '', art: 'headphone', images: [], specs: [], variants: [], waCustom: '', stock: true, visible: true, featured: true };
+    const e = editing;
+    $('#editor').innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+        <div>
+          <span class="eyebrow">Estudio de producto</span>
+          <h2 style="font-size:24px;font-weight:800;letter-spacing:-0.04em;margin-top:4px">${p ? 'Editar ficha de producto' : 'Crear nuevo producto'}</h2>
+        </div>
+        <button class="close" id="ed-x">×</button>
+      </div>
+      <form id="edForm">
+        <div class="studio-grid">
+          <div>
+            <div class="studio-box">
+              <div class="f">
+                <label>Galería de imágenes <small>Haz clic en una miniatura para hacerla Principal</small></label>
+                <div class="imgs" id="edImgs"></div>
+                <div style="display:flex;gap:8px">
+                  <input id="imgUrlInput" placeholder="Pegar URL de imagen (https://...)" style="flex:1">
+                  <button type="button" class="btn btn-dark btn-sm" id="addImgUrl">Añadir URL</button>
+                </div>
+                <input type="file" id="file" accept="image/*" multiple hidden>
+              </div>
+              <div class="f" style="margin-bottom:0">
+                <label>Ilustración de respaldo (si no hay foto)</label>
+                <select name="art">${Object.entries(ARTS).map(([k, v]) => `<option value="${k}" ${k === e.art ? 'selected' : ''}>${v}</option>`).join('')}</select>
+              </div>
+            </div>
+
+            <div class="studio-box">
+              <div class="cols-3">
+                <div class="f"><label>Costo (${esc(D.settings.currency)})</label><input name="cost" type="number" min="0" step="0.01" value="${e.cost || ''}" placeholder="Opcional"></div>
+                <div class="f"><label>Precio venta *</label><input name="price" type="number" min="0" step="0.01" required value="${e.price}"></div>
+                <div class="f"><label>Precio anterior</label><input name="old" type="number" min="0" step="0.01" value="${e.old ?? ''}"></div>
+              </div>
+              <label style="font-size:11px;font-weight:700;color:var(--muted)">Aplicar descuento automático:</label>
+              <div class="quick">
+                <button type="button" class="btn btn-ghost btn-sm" data-d="50">50% Mitad</button>
+                <button type="button" class="btn btn-ghost btn-sm" data-d="30">-30%</button>
+                <button type="button" class="btn btn-ghost btn-sm" data-d="25">-25%</button>
+                <button type="button" class="btn btn-ghost btn-sm" data-d="20">-20%</button>
+                <button type="button" class="btn btn-ghost btn-sm" data-d="10">-10%</button>
+                <button type="button" class="btn btn-ghost btn-sm" data-d="0">Precio normal</button>
+              </div>
+              <div id="savingPreview" style="font-size:12px;font-weight:700;color:var(--wa-solid)"></div>
+            </div>
+
+            <div class="studio-box" style="margin-bottom:0">
+              <label style="font-size:12px;font-weight:700;display:block;margin-bottom:8px">Estado y visibilidad</label>
+              <div class="sw">
+                <label><input type="checkbox" name="stock" ${e.stock ? 'checked' : ''}> En stock</label>
+                <label><input type="checkbox" name="visible" ${e.visible ? 'checked' : ''}> Visible en tienda</label>
+                <label><input type="checkbox" name="featured" ${e.featured ? 'checked' : ''}> Destacar en inicio</label>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="studio-box">
+              <div class="f"><label>Nombre del producto *</label><input name="name" required maxlength="120" placeholder="Ej. Audífonos Studio Wireless ANC" value="${esc(e.name)}"></div>
+              <div class="cols">
+                <div class="f"><label>Categoría</label><select name="cat">${D.categories.map(c => `<option value="${c.id}" ${c.id === e.cat ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}</select></div>
+                <div class="f"><label>Código / SKU</label><input name="sku" maxlength="40" placeholder="VYR-001" value="${esc(e.sku || '')}"></div>
+              </div>
+              <div class="cols">
+                <div class="f"><label>Línea / Marca</label><input name="brand" maxlength="80" placeholder="SONIDO / ESTUDIO" value="${esc(e.brand || '')}"></div>
+                <div class="f"><label>Insignia superior</label><input name="badge" maxlength="30" placeholder="Nuevo, Oferta, Edición Pro..." value="${esc(e.badge || '')}"></div>
+              </div>
+              <div class="f" style="margin-bottom:0"><label>Descripción comercial</label><textarea name="desc" maxlength="2000" placeholder="Describe los beneficios principales del producto...">${esc(e.desc)}</textarea></div>
+            </div>
+
+            <div class="studio-box" style="margin-bottom:0">
+              <div class="f">
+                <label>Especificaciones destacadas <small>(separadas por coma)</small></label>
+                <input name="specs" placeholder="Ej. Batería 38h, Cancelación ANC, Carga USB-C" value="${esc((e.specs || []).join(', '))}">
+              </div>
+              <div class="f">
+                <label>Variantes / Colores disponibles <small>(separados por coma)</small></label>
+                <input name="variants" placeholder="Ej. Negro Mate, Plata Lunar, Titanio" value="${esc((e.variants || []).join(', '))}">
+              </div>
+              <div class="f" style="margin-bottom:0">
+                <label>Nota adicional para el mensaje de WhatsApp (opcional)</label>
+                <input name="waCustom" placeholder="Ej. Incluye envío gratis y garantía de 12 meses" value="${esc(e.waCustom || '')}">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="err" id="edErr" style="margin-top:12px"></div>
+        <div class="btn-row" style="justify-content:flex-end;margin-top:12px">
+          <button type="button" class="btn btn-ghost" id="edCancel">Cancelar</button>
+          <button type="submit" class="btn btn-dark btn-lg">Guardar producto</button>
+        </div>
+      </form>`;
+
+    const ed = $('#editor');
+    const f = $('#edForm');
+
+    const updateSaving = () => {
+      const pr = Number(f.price.value || 0);
+      const ol = Number(f.old.value || 0);
+      const co = Number(f.cost.value || 0);
+      const parts = [];
+      if (ol > pr && pr > 0) parts.push(`Oferta: -${Math.round((1 - pr / ol) * 100)}% (Ahorro cliente: ${price(ol - pr)})`);
+      if (co > 0 && pr > 0) parts.push(`Ganancia neta: ${price(pr - co)} (${Math.round((pr - co) / pr * 100)}%)`);
+      $('#savingPreview').textContent = parts.join(' · ');
+    };
+    updateSaving();
+    f.price.oninput = f.old.oninput = f.cost.oninput = updateSaving;
+
+    const drawImgs = () => {
+      $('#edImgs').innerHTML = e.images.map((u, i) =>
+        `<div class="im" data-main="${i}" title="Clic para hacer principal"><img src="${esc(u)}" alt="">${i ? '' : '<i>Principal</i>'}<button type="button" data-rm="${i}" aria-label="Quitar">×</button></div>`
+      ).join('') + (e.images.length < 8 ? '<div class="upload" id="upBtn">+ Subir<br>foto</div>' : '');
+    };
+    drawImgs();
+
+    $('#edImgs').onclick = ev => {
+      const r = ev.target.closest('[data-rm]');
+      if (r) { ev.stopPropagation(); e.images.splice(+r.dataset.rm, 1); drawImgs(); return; }
+      const m = ev.target.closest('[data-main]');
+      if (m && +m.dataset.main > 0) {
+        const idx = +m.dataset.main;
+        const [picked] = e.images.splice(idx, 1);
+        e.images.unshift(picked);
+        drawImgs();
+        toast('Imagen establecida como principal');
+        return;
+      }
+      if (ev.target.closest('#upBtn')) $('#file').click();
+    };
+    $('#addImgUrl').onclick = () => {
+      const u = $('#imgUrlInput').value.trim();
+      if (/^https?:\/\//.test(u) && e.images.length < 8) {
+        e.images.push(u);
+        $('#imgUrlInput').value = '';
+        drawImgs();
+      }
+    };
+    $('#file').onchange = async ev => {
+      for (const file of [...ev.target.files]) {
+        if (e.images.length >= 8) break;
+        try {
+          toast('Procesando imagen...');
+          const data = await shrink(file);
+          const r = await api('POST', '/api/admin/upload', { data });
+          e.images.push(r.url);
+          drawImgs();
+        } catch (x) { toast(x.message); }
+      }
+      ev.target.value = '';
+    };
+    f.querySelector('.quick').onclick = ev => {
+      const b = ev.target.closest('[data-d]');
+      if (!b) return;
+      const d = +b.dataset.d;
+      const pr = f.price;
+      const ol = f.old;
+      if (!d) { if (ol.value) pr.value = ol.value; ol.value = ''; updateSaving(); return; }
+      const base = +ol.value > +pr.value ? +ol.value : +pr.value;
+      if (!base) return;
+      ol.value = base;
+      pr.value = Math.round(base * (100 - d)) / 100;
+      updateSaving();
+    };
+    f.onsubmit = async ev => {
+      ev.preventDefault();
+      $('#edErr').textContent = '';
+      const g = n => f[n].value;
+      const specs = g('specs').split(',').map(s => s.trim()).filter(Boolean);
+      const variants = g('variants').split(',').map(s => s.trim()).filter(Boolean);
+      const body = {
+        name: g('name'), sku: g('sku'), cat: g('cat'), brand: g('brand'), desc: g('desc'),
+        price: g('price'), old: g('old'), cost: g('cost'), badge: g('badge'), art: g('art'),
+        images: e.images, specs, variants, waCustom: g('waCustom'),
+        stock: f.stock.checked, visible: f.visible.checked, featured: f.featured.checked
+      };
+      if (body.old !== '' && +body.old <= +body.price) body.old = null;
+      try {
+        if (p) { const n = await api('PUT', '/api/admin/products/' + p.id, body); Object.assign(p, n); }
+        else { D.products.unshift(await api('POST', '/api/admin/products', body)); }
+        closeEd();
+        toast('Producto guardado');
+        vProducts();
+      } catch (x) { $('#edErr').textContent = x.message; }
+    };
+    $('#ed-x').onclick = $('#edCancel').onclick = closeEd;
+    ed.classList.add('open');
+    $('#overlay').classList.add('on');
+  }
+
+  const closeEd = () => { $('#editor').classList.remove('open'); $('#overlay').classList.remove('on'); };
+  $('#overlay').onclick = closeEd;
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeEd(); });
+
+  function shrink(file, max = 1400) {
+    return new Promise((res, rej) => {
+      if (!/^image\//.test(file.type)) return rej(new Error('El archivo no es una imagen válida'));
+      const im = new Image();
+      const u = URL.createObjectURL(file);
+      im.onload = () => {
+        const k = Math.min(1, max / Math.max(im.width, im.height));
+        const c = document.createElement('canvas');
+        c.width = Math.round(im.width * k);
+        c.height = Math.round(im.height * k);
+        c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(u);
+        res(c.toDataURL('image/jpeg', 0.88));
+      };
+      im.onerror = () => rej(new Error('No se pudo procesar la imagen'));
+      im.src = u;
+    });
+  }
+
+  /* =========================================================================
+     2. DISEÑO Y PORTADA WEB (Control Total de Imágenes, Textos y Botones)
+     ========================================================================= */
+  function vSite() {
+    const s = D.settings;
+    const fld = (k, l, h = '') => `<div class="f"><label>${l}</label><input name="${k}" value="${esc(s[k] ?? '')}" ${h}></div>`;
+    const linkSelect = (k, label) => {
+      const val = s[k] || '/catalogo.html';
+      const opts = [
+        ['/catalogo.html', 'Todo el catálogo'],
+        ['/catalogo.html?oferta=1', 'Productos en oferta'],
+        ...D.categories.map(c => [`/catalogo.html?cat=${c.id}`, `Categoría: ${c.name}`])
+      ];
+      return `<div class="f"><label>${label}</label>
+        <div style="display:flex;gap:8px">
+          <select data-link-target="${k}" style="width:190px">
+            <option value="">Elegir destino...</option>
+            ${opts.map(([u, n]) => `<option value="${esc(u)}" ${val === u ? 'selected' : ''}>${esc(n)}</option>`).join('')}
+          </select>
+          <input name="${k}" id="lnk_${k}" value="${esc(val)}" style="flex:1">
+        </div>
+      </div>`;
+    };
+    const imgField = (k, label) => `
+      <div class="f">
+        <label>${label}</label>
+        <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;background:var(--surface);padding:12px;border-radius:var(--r-md)">
+          <img class="herop" id="prev_${k}" src="${esc(s[k] || VyraArt('headphone'))}" alt="">
+          <div style="flex:1;min-width:220px;display:grid;gap:8px">
+            <input name="${k}" id="inp_${k}" value="${esc(s[k] || '')}" placeholder="https://..." style="background:var(--paper)">
+            <div class="btn-row">
+              <button type="button" class="btn btn-dark btn-sm" data-up="${k}">Subir desde mi computadora</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+
+    const benefits = Array.isArray(s.benefits) ? s.benefits : [];
+    const steps = Array.isArray(s.steps) ? s.steps : [];
+
+    $('#view').innerHTML = `
+      <div class="head">
+        <div>
+          <h1>Editor completo del sitio web</h1>
+          <p>Cambia cualquier imagen, título, texto de botón (como "Ver colección") o sección de tu tienda cuando quieras.</p>
+        </div>
+        <div class="btn-row">
+          <a class="btn btn-ghost btn-sm" href="/" target="_blank">Ver página de inicio</a>
+          <button type="button" class="btn btn-dark" id="saveSiteTop">Guardar todos los cambios</button>
+        </div>
+      </div>
+
+      <div class="subtabs" id="siteSubTabs">
+        <button type="button" class="chip ${siteSubTab === 'portada' ? 'active' : ''}" data-st="portada">1. Portada y tarjetas laterales</button>
+        <button type="button" class="chip ${siteSubTab === 'editorial' ? 'active' : ''}" data-st="editorial">2. Imágenes estilo de vida y secciones</button>
+        <button type="button" class="chip ${siteSubTab === 'beneficios' ? 'active' : ''}" data-st="beneficios">3. Beneficios, pasos y cierre</button>
+        <button type="button" class="chip ${siteSubTab === 'marca' ? 'active' : ''}" data-st="marca">4. Identidad, WhatsApp y colores</button>
+      </div>
+
+      <form id="siteForm">
+        <!-- PESTAÑA 1: PORTADA Y TARJETAS LATERALES -->
+        <div class="site-pane" data-pane="portada" ${siteSubTab === 'portada' ? '' : 'hidden'}>
+          <div class="panel">
+            <h2>Bloque principal de portada (Izquierda)</h2>
+            <p class="panel-sub">Modifica la fotografía principal, los títulos y los textos de los dos botones de portada.</p>
+            <div class="cols">
+              <div>
+                ${fld('heroBadge', 'Etiqueta superior (ej. CURADURÍA TECNOLÓGICA / VOL. 03)')}
+                <div class="cols">${fld('heroTitle', 'Título principal (1.ª línea)')}${fld('heroAccent', 'Título destacado (2.ª línea)')}</div>
+                <div class="f"><label>Descripción de portada</label><textarea name="heroText">${esc(s.heroText)}</textarea></div>
+                <div class="cols">${fld('heroCta', 'Texto del botón 1 (Catálogo)')}${fld('heroCta2', 'Texto del botón 2 (WhatsApp)')}</div>
+              </div>
+              <div>
+                ${imgField('heroImage', 'Fotografía principal de portada')}
+              </div>
+            </div>
+          </div>
+
+          <div class="cols">
+            <div class="panel">
+              <h2>Tarjeta lateral 1 (Superior derecha)</h2>
+              <p class="panel-sub">Personaliza el texto, el botón (ej. "Ver colección"), el color del recuadro y su fotografía.</p>
+              ${fld('heroSide1Sub', 'Subtítulo superior (ej. 01 — SIEMPRE CONTIGO)')}
+              ${fld('heroSide1Title', 'Título de la tarjeta (ej. Conecta con lo que viene.)')}
+              <div class="cols">
+                ${fld('heroSide1Btn', 'Texto del botón (ej. Ver colección)')}
+                <div class="f"><label>Color de fondo del cuadro</label><input type="color" name="heroSide1Bg" value="${esc(s.heroSide1Bg || '#e5e2f2')}" style="height:40px;padding:4px"></div>
+              </div>
+              ${linkSelect('heroSide1Link', 'Al hacer clic llevar a')}
+              ${imgField('heroSide1Image', 'Fotografía de la tarjeta lateral 1')}
+            </div>
+
+            <div class="panel">
+              <h2>Tarjeta lateral 2 (Inferior derecha)</h2>
+              <p class="panel-sub">Personaliza el texto, el botón (ej. "Ver colección"), el color del recuadro y su fotografía.</p>
+              ${fld('heroSide2Sub', 'Subtítulo superior (ej. 02 — MÁS ENERGÍA)')}
+              ${fld('heroSide2Title', 'Título de la tarjeta (ej. Pequeño. Poderoso.)')}
+              <div class="cols">
+                ${fld('heroSide2Btn', 'Texto del botón (ej. Ver colección)')}
+                <div class="f"><label>Color de fondo del cuadro</label><input type="color" name="heroSide2Bg" value="${esc(s.heroSide2Bg || '#ebe5dc')}" style="height:40px;padding:4px"></div>
+              </div>
+              ${linkSelect('heroSide2Link', 'Al hacer clic llevar a')}
+              ${imgField('heroSide2Image', 'Fotografía de la tarjeta lateral 2')}
+            </div>
+          </div>
+        </div>
+
+        <!-- PESTAÑA 2: BLOQUES EDITORIALES Y ENCABEZADOS DE SECCIONES -->
+        <div class="site-pane" data-pane="editorial" ${siteSubTab === 'editorial' ? '' : 'hidden'}>
+          <div class="panel">
+            <h2>Títulos de las secciones de inicio</h2>
+            <p class="panel-sub">Personaliza los encabezados de cada área de la página principal.</p>
+            <div class="cols-3">
+              <div>${fld('sec1Eyebrow', 'Sección 1 — Etiqueta')}${fld('sec1Title', 'Sección 1 — Título')}${fld('sec1Accent', 'Sección 1 — Palabra destacada')}</div>
+              <div>${fld('sec2Eyebrow', 'Sección 2 — Etiqueta')}${fld('sec2Title', 'Sección 2 — Título')}${fld('sec2Accent', 'Sección 2 — Palabra destacada')}</div>
+              <div>${fld('sec3Eyebrow', 'Carrusel — Etiqueta')}${fld('sec3Title', 'Carrusel — Título (ej. Los más)')}${fld('sec3Accent', 'Carrusel — Destacado (ej. destacados.)')}</div>
+            </div>
+            <div class="cols-3" style="margin-top:8px">
+              <div>${fld('sec4Eyebrow', 'Estilo de vida — Etiqueta')}</div>
+              <div>${fld('sec4Title', 'Estilo de vida — Título')}${fld('sec4Accent', 'Estilo de vida — Destacado')}</div>
+              <div>${fld('sec4Sub', 'Estilo de vida — Descripción')}</div>
+            </div>
+          </div>
+
+          <div class="cols">
+            <div class="panel">
+              <h2>Bloque editorial 1 ("Tu espacio. Tu sonido.")</h2>
+              <p class="panel-sub">Cambia la fotografía de fondo, los textos y el botón de acción.</p>
+              ${fld('ed1Eyebrow', 'Etiqueta superior')}
+              ${fld('ed1Title', 'Título grande')}
+              ${fld('ed1Text', 'Descripción breve')}
+              ${fld('ed1Btn', 'Texto del botón')}
+              ${linkSelect('ed1Link', 'Destino del botón')}
+              ${imgField('ed1Image', 'Fotografía panorámica 1')}
+            </div>
+
+            <div class="panel">
+              <h2>Bloque editorial 2 ("Todo listo. Adonde vayas.")</h2>
+              <p class="panel-sub">Cambia la fotografía de fondo, los textos y el botón de acción.</p>
+              ${fld('ed2Eyebrow', 'Etiqueta superior')}
+              ${fld('ed2Title', 'Título grande')}
+              ${fld('ed2Text', 'Descripción breve')}
+              ${fld('ed2Btn', 'Texto del botón')}
+              ${linkSelect('ed2Link', 'Destino del botón')}
+              ${imgField('ed2Image', 'Fotografía panorámica 2')}
+            </div>
+          </div>
+        </div>
+
+        <!-- PESTAÑA 3: BENEFICIOS, 3 PASOS DE COMPRA Y BANNER DE CIERRE -->
+        <div class="site-pane" data-pane="beneficios" ${siteSubTab === 'beneficios' ? '' : 'hidden'}>
+          <div class="panel">
+            <h2>Franja de 4 beneficios (bajo la portada)</h2>
+            <p class="panel-sub">Resalta las garantías y ventajas de comprar en tu tienda.</p>
+            <div class="cols">
+              ${benefits.map((b, i) => `
+                <div style="background:var(--surface);padding:14px;border-radius:var(--r-md);display:grid;gap:8px">
+                  <div class="cols">
+                    <div class="f" style="margin:0"><label>Icono</label>
+                      <select name="bi_${i}" style="background:var(--paper)">
+                        ${[['bolt', 'Rayo (Rapidez)'], ['shield', 'Escudo (Garantía)'], ['truck', 'Camión (Envíos)'], ['spark', 'Estrella (Calidad)'], ['check', 'Verificado']].map(([k, l]) => `<option value="${k}" ${b.icon === k ? 'selected' : ''}>${l}</option>`).join('')}
+                      </select>
+                    </div>
+                    <div class="f" style="margin:0"><label>Título</label><input name="bt_${i}" value="${esc(b.title)}" style="background:var(--paper)"></div>
+                  </div>
+                  <div class="f" style="margin:0"><label>Descripción</label><input name="bx_${i}" value="${esc(b.text)}" style="background:var(--paper)"></div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <div class="panel">
+            <h2>Sección: Compra en 3 pasos</h2>
+            <div class="cols-3">
+              ${fld('stepsEyebrow', 'Etiqueta de sección')}
+              ${fld('stepsTitle', 'Título')}
+              ${fld('stepsAccent', 'Palabra destacada')}
+            </div>
+            ${fld('stepsSub', 'Descripción de apoyo')}
+            <div class="cols-3">
+              ${steps.map((st, i) => `
+                <div style="background:var(--surface);padding:14px;border-radius:var(--r-md)">
+                  <div class="f"><label>Etiqueta paso ${i + 1}</label><input name="sn_${i}" value="${esc(st.num)}" style="background:var(--paper)"></div>
+                  <div class="f"><label>Título paso ${i + 1}</label><input name="st_${i}" value="${esc(st.title)}" style="background:var(--paper)"></div>
+                  <div class="f" style="margin:0"><label>Texto paso ${i + 1}</label><textarea name="sx_${i}" style="background:var(--paper);min-height:70px">${esc(st.text)}</textarea></div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <div class="panel">
+            <h2>Banner final de contacto y cotizaciones</h2>
+            <div class="cols">${fld('promoEyebrow', 'Etiqueta superior')}${fld('promoTitle', 'Título principal')}</div>
+            ${fld('promoText', 'Descripción')}
+            <div class="cols">${fld('promoBtn1', 'Texto botón WhatsApp')}${fld('promoBtn2', 'Texto botón Catálogo')}</div>
+          </div>
+        </div>
+
+        <!-- PESTAÑA 4: IDENTIDAD, WHATSAPP Y COLORES -->
+        <div class="site-pane" data-pane="marca" ${siteSubTab === 'marca' ? '' : 'hidden'}>
+          <div class="panel">
+            <h2>Identidad, número de WhatsApp y barra de anuncio</h2>
+            <div class="cols">${fld('storeName', 'Nombre de la tienda')}${fld('currency', 'Símbolo de moneda (Bs, USD...)')}</div>
+            <div class="cols">${fld('whatsapp', 'Número de WhatsApp (con código de país, ej. 59170000000)', 'inputmode="numeric"')}${fld('address', 'Ubicación / Cobertura')}</div>
+            ${fld('announcement', 'Texto de la barra superior')}
+            <div style="margin:-6px 0 14px">
+              <small style="color:var(--muted);display:block;margin-bottom:6px">Plantillas rápidas para la barra superior:</small>
+              <div class="btn-row">
+                <button type="button" class="chip" data-ann="ENVÍOS GRATIS HOY EN TODOS LOS PEDIDOS · ATENCIÓN INMEDIATA POR WHATSAPP">Envío gratis hoy</button>
+                <button type="button" class="chip" data-ann="SEMANA DE DESCUENTOS HASTA 50% OFF · UNIDADES LIMITADAS">Semana 50% OFF</button>
+                <button type="button" class="chip" data-ann="NUEVA COLECCIÓN DISPONIBLE · COMPRA DIRECTA Y GARANTÍA OFICIAL">Nueva colección</button>
+              </div>
+            </div>
+            ${fld('footerText', 'Descripción en el pie de página')}
+            <div class="cols-3">
+              ${fld('instagram', 'Instagram URL')}
+              ${fld('facebook', 'Facebook URL')}
+              ${fld('tiktok', 'TikTok URL')}
+            </div>
+            <div class="f" style="margin-top:10px">
+              <label>Color de acento principal de la tienda</label>
+              <div class="swatch-bar">
+                <input type="color" name="accent" id="accentInput" value="${esc(s.accent)}" style="width:46px;height:40px;padding:2px;cursor:pointer">
+                ${['#d9f059', '#38bdf8', '#f97316', '#a78bfa', '#34d399', '#fb7185'].map(c => `<button type="button" class="swatch" data-col="${c}" style="background:${c}" title="${c}"></button>`).join('')}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-dark btn-lg">Guardar configuración del sitio</button>
+      </form>`;
+
+    $('#siteSubTabs').onclick = e => {
+      const b = e.target.closest('[data-st]');
+      if (!b) return;
+      siteSubTab = b.dataset.st;
+      $$('#siteSubTabs .chip').forEach(c => c.classList.toggle('active', c.dataset.st === siteSubTab));
+      $$('.site-pane').forEach(p => p.hidden = p.dataset.pane !== siteSubTab);
+    };
+
+    $$('[data-link-target]').forEach(sel => sel.onchange = () => {
+      if (sel.value) $('#lnk_' + sel.dataset.linkTarget).value = sel.value;
+    });
+
+    $$('[data-ann]').forEach(btn => btn.onclick = () => {
+      $('#siteForm').announcement.value = btn.dataset.ann;
+      toast('Texto aplicado a la barra superior');
+    });
+
+    $$('[data-up]').forEach(btn => btn.onclick = () => {
+      const k = btn.dataset.up;
+      pickAndUpload(url => {
+        $('#inp_' + k).value = url;
+        $('#prev_' + k).src = url;
+        toast('Fotografía subida, guarda los cambios');
+      }, 1600);
+    });
+
+    $$('[data-col]').forEach(sw => sw.onclick = () => {
+      $('#accentInput').value = sw.dataset.col;
+    });
+
+    const saveAllSite = async () => {
+      const f = $('#siteForm');
+      const b = {};
+      [
+        'storeName', 'currency', 'whatsapp', 'address', 'announcement', 'footerText', 'instagram', 'facebook', 'tiktok',
+        'heroBadge', 'heroCta', 'heroCta2', 'heroTitle', 'heroAccent', 'heroText', 'heroImage',
+        'heroSide1Sub', 'heroSide1Title', 'heroSide1Btn', 'heroSide1Link', 'heroSide1Bg', 'heroSide1Image',
+        'heroSide2Sub', 'heroSide2Title', 'heroSide2Btn', 'heroSide2Link', 'heroSide2Bg', 'heroSide2Image',
+        'sec1Eyebrow', 'sec1Title', 'sec1Accent', 'sec2Eyebrow', 'sec2Title', 'sec2Accent',
+        'sec3Eyebrow', 'sec3Title', 'sec3Accent', 'sec4Eyebrow', 'sec4Title', 'sec4Accent', 'sec4Sub',
+        'ed1Eyebrow', 'ed1Title', 'ed1Text', 'ed1Btn', 'ed1Link', 'ed1Image',
+        'ed2Eyebrow', 'ed2Title', 'ed2Text', 'ed2Btn', 'ed2Link', 'ed2Image',
+        'stepsEyebrow', 'stepsTitle', 'stepsAccent', 'stepsSub',
+        'promoEyebrow', 'promoTitle', 'promoText', 'promoBtn1', 'promoBtn2', 'accent'
+      ].forEach(k => { if (f[k]) b[k] = f[k].value; });
+
+      b.benefits = benefits.map((_, i) => ({
+        icon: f['bi_' + i].value,
+        title: f['bt_' + i].value,
+        text: f['bx_' + i].value
+      }));
+      b.steps = steps.map((_, i) => ({
+        num: f['sn_' + i].value,
+        title: f['st_' + i].value,
+        text: f['sx_' + i].value
+      }));
+
+      try {
+        D.settings = await api('PUT', '/api/admin/settings', b);
+        toast('Todos los cambios del sitio fueron guardados');
+      } catch (x) { toast(x.message); }
+    };
+
+    $('#saveSiteTop').onclick = saveAllSite;
+    $('#siteForm').onsubmit = e => { e.preventDefault(); saveAllSite(); };
+  }
+
+  /* =========================================================================
+     3. CATEGORÍAS Y MOSAICO BENTO (Reordenamiento, Botones, Fotos y Ofertas)
+     ========================================================================= */
+  function vCats() {
+    let cats = D.categories.map(c => ({ ...c }));
+    const slotLabels = [
+      'Posición 01 · Cuadro Vertical Amplio (Principal)',
+      'Posición 02 · Cuadro Mediano Superior',
+      'Posición 03 · Cuadro Compacto Superior',
+      'Posición 04 · Cuadro Panorámico Inferior'
+    ];
+    const draw = () => {
+      $('#view').innerHTML = `
+        <div class="head">
+          <div>
+            <h1>Categorías y mosaico visual</h1>
+            <p>Organiza el orden del mosaico Bento, cambia sus fotografías, el texto de sus botones y aplica descuentos por categoría.</p>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-ghost btn-sm" id="addC">+ Nueva categoría</button>
+            <button class="btn btn-dark" id="saveC">Guardar categorías</button>
+          </div>
+        </div>
+        <div class="cat-cards-grid">
+          ${cats.map((c, i) => {
+            const count = D.products.filter(p => p.cat === c.id).length;
+            const onSale = D.products.filter(p => p.cat === c.id && p.old > p.price).length;
+            return `
+            <div class="cat-edit-card">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+                <span class="tag y">${esc(slotLabels[i] || `Categoría ${i + 1}`)}</span>
+                <div class="btn-row" style="gap:4px">
+                  <button type="button" class="btn-icon" style="width:30px;height:30px" data-mv="-1" data-i="${i}" ${i === 0 ? 'disabled' : ''} title="Subir posición">↑</button>
+                  <button type="button" class="btn-icon" style="width:30px;height:30px" data-mv="1" data-i="${i}" ${i === cats.length - 1 ? 'disabled' : ''} title="Bajar posición">↓</button>
+                </div>
+              </div>
+              <img id="cprev_${i}" src="${esc(c.image || VyraArt('headphone'))}" alt="">
+              <div class="cols">
+                <div class="f" style="margin:0"><label>Nombre</label><input data-i="${i}" data-k="name" value="${esc(c.name)}" placeholder="Ej. Sonido"></div>
+                <div class="f" style="margin:0"><label>Texto del botón</label><input data-i="${i}" data-k="cta" value="${esc(c.cta || 'Explorar')}" placeholder="Ej. Explorar"></div>
+              </div>
+              <div class="f" style="margin:0"><label>Frase o título editorial del cuadro</label><input data-i="${i}" data-k="subtitle" value="${esc(c.subtitle || '')}" placeholder="Ej. Haz que cada nota cuente."></div>
+              <div class="f" style="margin:0"><label>URL de la fotografía</label><input data-i="${i}" data-k="image" id="cinp_${i}" value="${esc(c.image || '')}" placeholder="https://..."></div>
+              <div style="background:var(--surface);padding:10px 12px;border-radius:var(--r-sm);display:flex;justify-content:space-between;align-items:center;font-size:12px">
+                <span><b>${count}</b> productos (${onSale} en oferta)</span>
+                <div class="btn-row" style="gap:4px">
+                  <button type="button" class="btn btn-ghost btn-sm" style="height:30px;padding:0 8px" data-cat-disc="${c.id}">-30% a todos</button>
+                  <button type="button" class="btn btn-ghost btn-sm" style="height:30px;padding:0 8px" data-cat-view="${c.id}">Ver productos</button>
+                </div>
+              </div>
+              <div class="btn-row" style="justify-content:space-between">
+                <button type="button" class="btn btn-dark btn-sm" data-cup="${i}">Subir foto desde mi equipo</button>
+                <button type="button" class="btn btn-ghost btn-sm" data-rm="${i}" style="color:var(--danger)">Eliminar</button>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>`;
+
+      $('#view').oninput = e => {
+        const i = e.target.dataset.i;
+        const k = e.target.dataset.k;
+        if (i !== undefined && k) {
+          cats[i][k] = e.target.value;
+          if (k === 'image') $('#cprev_' + i).src = e.target.value || VyraArt('headphone');
+        }
+      };
+      $$('[data-mv]').forEach(btn => btn.onclick = () => {
+        const idx = +btn.dataset.i;
+        const dir = +btn.dataset.mv;
+        const target = idx + dir;
+        if (target < 0 || target >= cats.length) return;
+        const tmp = cats[idx];
+        cats[idx] = cats[target];
+        cats[target] = tmp;
+        draw();
+      });
+      $$('[data-cup]').forEach(btn => btn.onclick = () => {
+        const idx = +btn.dataset.cup;
+        pickAndUpload(url => {
+          cats[idx].image = url;
+          draw();
+          toast('Fotografía cargada, recuerda guardar categorías');
+        });
+      });
+      $$('[data-cat-view]').forEach(btn => btn.onclick = () => {
+        catFilter = btn.dataset.catView;
+        tab = 'products';
+        render();
+      });
+      $$('[data-cat-disc]').forEach(btn => btn.onclick = async () => {
+        const cid = btn.dataset.catDisc;
+        if (!confirm('¿Aplicar 30% de descuento a todos los productos de esta categoría?')) return;
+        const res = await api('POST', '/api/admin/bulk', { action: 'discount', value: 30, cat: cid });
+        D.products = res.products;
+        toast('Descuento del 30% aplicado a la categoría');
+        draw();
+      });
+      $('#addC').onclick = () => {
+        cats.push({ id: 'cat' + Math.random().toString(36).slice(2, 6), name: 'Nueva categoría', subtitle: 'Descubre la colección', cta: 'Explorar', image: '' });
+        draw();
+      };
+      $$('[data-rm]').forEach(btn => btn.onclick = () => {
+        cats.splice(+btn.dataset.rm, 1);
+        draw();
+      });
+      $('#saveC').onclick = async () => {
+        try {
+          D.categories = await api('PUT', '/api/admin/categories', { categories: cats.filter(c => c.name.trim()) });
+          toast('Categorías guardadas correctamente');
+          vCats();
+        } catch (x) { toast(x.message); }
+      };
+    };
+    draw();
+  }
+
+  /* =========================================================================
+     4. SUITE DE MARKETING, VENTAS, COMBOS, QR Y RENTABILIDAD
+     ========================================================================= */
+  function vTools() {
+    const origin = location.origin;
+    const P = D.products;
+    const firstId = P[0]?.id || '';
+
+    $('#view').innerHTML = `
+      <div class="head">
+        <div>
+          <h1>Centro de marketing y aceleración de ventas</h1>
+          <p>Herramientas comerciales para promocionar tus productos, armar combos, generar enlaces QR y calcular ganancias.</p>
+        </div>
+      </div>
+
+      <div class="subtabs" id="mktTabs">
+        <button type="button" class="chip ${mktSubTab === 'copys' ? 'active' : ''}" data-mt="copys">1. Generador de anuncios y textos de venta</button>
+        <button type="button" class="chip ${mktSubTab === 'combos' ? 'active' : ''}" data-mt="combos">2. Creador de combos y paquetes</button>
+        <button type="button" class="chip ${mktSubTab === 'links' ? 'active' : ''}" data-mt="links">3. Enlaces de campaña y códigos QR</button>
+        <button type="button" class="chip ${mktSubTab === 'calc' ? 'active' : ''}" data-mt="calc">4. Calculadora de rentabilidad y respaldo</button>
+      </div>
+
+      <!-- 1. GENERADOR DE ANUNCIOS -->
+      <div class="mkt-pane" data-mp="copys" ${mktSubTab === 'copys' ? '' : 'hidden'}>
+        <div class="panel">
+          <h2>Generador automático de textos persuasivos para redes y WhatsApp</h2>
+          <p class="panel-sub">Selecciona un producto y obtén 3 anuncios listos para publicar en estados de WhatsApp, Instagram o TikTok con su enlace directo.</p>
+          <div class="f" style="max-width:480px">
+            <label>Seleccionar producto del catálogo</label>
+            <select id="copyProdSel">
+              ${P.map(p => `<option value="${p.id}">${esc(p.name)} — ${price(p.price)}</option>`).join('')}
+            </select>
+          </div>
+          <div class="cols-3" id="copyOutputs"></div>
+        </div>
+      </div>
+
+      <!-- 2. CREADOR DE COMBOS -->
+      <div class="mkt-pane" data-mp="combos" ${mktSubTab === 'combos' ? '' : 'hidden'}>
+        <div class="panel">
+          <h2>Creador de combos y paquetes promocionales</h2>
+          <p class="panel-sub">Selecciona 2 o más productos para armar una oferta conjunta y generar el mensaje promocional con el ahorro calculado.</p>
+          <div class="cols">
+            <div>
+              <div class="f"><label>Nombre del combo</label><input id="comboName" value="Pack Productividad Total"></div>
+              <div class="f"><label>Descuento especial del combo (%)</label><input id="comboDisc" type="number" value="15" min="1" max="80"></div>
+              <label style="font-size:12px;font-weight:700;display:block;margin-bottom:8px">Elige los productos del combo:</label>
+              <div style="display:grid;gap:6px;max-height:260px;overflow:auto;background:var(--surface);padding:12px;border-radius:var(--r-md)" id="comboChecks">
+                ${P.map((p, idx) => `
+                  <label style="display:flex;gap:10px;align-items:center;font-size:13px;font-weight:600;background:var(--paper);padding:8px 12px;border-radius:8px;cursor:pointer">
+                    <input type="checkbox" value="${p.id}" ${idx < 2 ? 'checked' : ''}>
+                    <span style="flex:1">${esc(p.name)}</span>
+                    <b>${price(p.price)}</b>
+                  </label>
+                `).join('')}
+              </div>
+            </div>
+            <div class="copy-card">
+              <strong style="font-size:14px">Vista previa de la promoción del combo</strong>
+              <pre id="comboPreview"></pre>
+              <div class="btn-row">
+                <button type="button" class="btn btn-dark" id="copyComboBtn">Copiar promoción del combo</button>
+                <a class="btn btn-wa" id="waComboBtn" target="_blank" rel="noopener">Compartir por WhatsApp</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. ENLACES Y CÓDIGOS QR -->
+      <div class="mkt-pane" data-mp="links" ${mktSubTab === 'links' ? '' : 'hidden'}>
+        <div class="cols">
+          <div class="panel">
+            <h2>Creador de enlaces de WhatsApp para campañas</h2>
+            <p class="panel-sub">Crea un enlace directo a tu WhatsApp con un mensaje personalizado para pegar en tu biografía de Instagram, TikTok o anuncios.</p>
+            <div class="f"><label>Mensaje que te enviará el cliente al hacer clic</label><textarea id="waCustomMsg">Hola, vi su catálogo en redes sociales y quiero consultar por una promoción disponible.</textarea></div>
+            <div class="f"><label>Enlace generado listo para usar</label><input id="waGenUrl" readonly></div>
+            <div class="btn-row">
+              <button type="button" class="btn btn-dark" id="copyWaGen">Copiar enlace de campaña</button>
+              <a class="btn btn-wa" id="testWaGen" target="_blank" rel="noopener">Probar enlace</a>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h2>Generador de código QR y enlaces directos</h2>
+            <p class="panel-sub">Elige cualquier sección o producto para obtener su enlace directo y su código QR listo para mostrar o descargar.</p>
+            <div class="f">
+              <label>Destino del enlace / QR</label>
+              <select id="qrTargetSel">
+                <option value="${origin}/catalogo.html">Catálogo completo (${origin}/catalogo.html)</option>
+                <option value="${origin}/">Página de inicio (${origin}/)</option>
+                <option value="${origin}/catalogo.html?oferta=1">Sección de ofertas (${origin}/catalogo.html?oferta=1)</option>
+                ${D.categories.map(c => `<option value="${origin}/catalogo.html?cat=${c.id}">Categoría: ${esc(c.name)}</option>`).join('')}
+                ${P.map(p => `<option value="${origin}/producto.html?id=${p.id}">Producto: ${esc(p.name)}</option>`).join('')}
+              </select>
+            </div>
+            <div style="display:flex;gap:18px;align-items:center;background:var(--surface);padding:16px;border-radius:var(--r-lg);flex-wrap:wrap">
+              <img id="qrImg" style="width:136px;height:136px;border-radius:12px;background:#fff;padding:8px" alt="Código QR">
+              <div style="flex:1;min-width:200px;display:grid;gap:8px">
+                <input id="qrUrlInput" readonly style="background:var(--paper);padding:10px 12px;border-radius:8px;font-size:12px">
+                <div class="btn-row">
+                  <button type="button" class="btn btn-dark btn-sm" id="copyQrUrl">Copiar link</button>
+                  <a class="btn btn-ghost btn-sm" id="dlQrBtn" download="qr-tienda.png" target="_blank">Abrir imagen QR</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. CALCULADORA DE RENTABILIDAD Y RESPALDO -->
+      <div class="mkt-pane" data-mp="calc" ${mktSubTab === 'calc' ? '' : 'hidden'}>
+        <div class="cols">
+          <div class="panel">
+            <h2>Simulador de precios, descuentos y meta de ganancias</h2>
+            <p class="panel-sub">Calcula tu ganancia real por unidad y cuántas ventas necesitas para alcanzar tu meta mensual.</p>
+            <div class="cols-3">
+              <div class="f"><label>Costo unitario (${esc(D.settings.currency)})</label><input id="simCost" type="number" value="200"></div>
+              <div class="f"><label>Precio normal (${esc(D.settings.currency)})</label><input id="simPrice" type="number" value="350"></div>
+              <div class="f"><label>Descuento promo (%)</label><input id="simDisc" type="number" value="0" min="0" max="90"></div>
+            </div>
+            <div class="f"><label>Meta de ganancia mensual deseada (${esc(D.settings.currency)})</label><input id="simGoal" type="number" value="5000"></div>
+            <div id="simResult" style="background:var(--surface);padding:16px;border-radius:var(--r-md);display:grid;gap:6px;font-size:13px"></div>
+          </div>
+
+          <div class="panel">
+            <h2>Respaldo e importación de base de datos</h2>
+            <p class="panel-sub">Descarga todo tu inventario en formato JSON o tabla CSV compatible con Excel.</p>
+            <div class="btn-row">
+              <button class="btn btn-dark" id="expJson">Descargar respaldo (.JSON)</button>
+              <button class="btn btn-ghost" id="expCsv">Exportar planilla Excel (.CSV)</button>
+              <button class="btn btn-ghost" id="impBtn">Restaurar desde archivo (.JSON)</button>
+              <input type="file" id="impFile" accept=".json,application/json" hidden>
+            </div>
+          </div>
+        </div>
+      </div>`;
+
+    $('#mktTabs').onclick = e => {
+      const b = e.target.closest('[data-mt]');
+      if (!b) return;
+      mktSubTab = b.dataset.mt;
+      $$('#mktTabs .chip').forEach(c => c.classList.toggle('active', c.dataset.mt === mktSubTab));
+      $$('.mkt-pane').forEach(p => p.hidden = p.dataset.mp !== mktSubTab);
+    };
+
+    /* Lógica 1: Generador de anuncios */
+    const renderCopys = () => {
+      const p = P.find(x => x.id === $('#copyProdSel').value) || P[0];
+      if (!p) return;
+      const url = `${origin}/producto.html?id=${p.id}`;
+      const off = pct(p);
+      const specsText = (p.specs || []).map(s => `• ${s}`).join('\n');
+      const templates = [
+        {
+          title: 'Opción 1 · Lanzamiento y presentación',
+          text: `NUEVO INGRESO EN ${D.settings.storeName.toUpperCase()}\n\n${p.name}\n${p.desc || ''}\n${specsText ? '\n' + specsText + '\n' : ''}\nPrecio: ${price(p.price)}\n\nMira todas las fotos y pide el tuyo aquí:\n${url}`
+        },
+        {
+          title: 'Opción 2 · Oferta y urgencia',
+          text: `${off ? `OFERTA ESPECIAL (-${off}% DE DESCUENTO)` : 'DESTACADO DE LA SEMANA'}\n\n${p.name}\n${off ? `Antes: ${price(p.old)}\nPrecio hoy: ${price(p.price)} (Ahorras ${price(p.old - p.price)})` : `Precio especial: ${price(p.price)}`}\n\nUnidades listas para entrega inmediata. Solicítalo aquí:\n${url}`
+        },
+        {
+          title: 'Opción 3 · Respuesta rápida para clientes',
+          text: `Hola, te comparto la ficha completa de *${p.name}*:\n${specsText ? specsText + '\n' : ''}Precio: *${price(p.price)}*\nDisponibilidad: ${p.stock ? 'En stock para envío inmediato' : 'Por encargo'}\n\nEnlace directo al producto:\n${url}`
+        }
+      ];
+      $('#copyOutputs').innerHTML = templates.map((t, i) => `
+        <div class="copy-card">
+          <strong style="font-size:13px">${esc(t.title)}</strong>
+          <pre id="cpText_${i}">${esc(t.text)}</pre>
+          <div class="btn-row">
+            <button type="button" class="btn btn-dark btn-sm" data-cp="${i}">Copiar texto</button>
+            <a class="btn btn-wa btn-sm" href="https://wa.me/?text=${encodeURIComponent(t.text)}" target="_blank" rel="noopener">Enviar a WhatsApp</a>
+          </div>
+        </div>
+      `).join('');
+      $$('[data-cp]').forEach(btn => btn.onclick = async () => {
+        const txt = templates[+btn.dataset.cp].text;
+        await navigator.clipboard.writeText(txt);
+        toast('Anuncio copiado al portapapeles');
+      });
+    };
+    if ($('#copyProdSel')) {
+      $('#copyProdSel').onchange = renderCopys;
+      renderCopys();
+    }
+
+    /* Lógica 2: Creador de Combos */
+    const updateCombo = () => {
+      const checkedIds = $$('#comboChecks input:checked').map(c => c.value);
+      const items = P.filter(p => checkedIds.includes(p.id));
+      const disc = Number($('#comboDisc').value || 0);
+      const name = $('#comboName').value || 'Combo Especial';
+      const normalSum = items.reduce((s, p) => s + Number(p.price), 0);
+      const finalPrice = Math.round(normalSum * (100 - disc)) / 100;
+      const text = `PROMOCIÓN ESPECIAL: ${name.toUpperCase()} (-${disc}%)\n\nIncluye:\n${items.map(p => `• ${p.name} (${price(p.price)})`).join('\n')}\n\nValor normal por separado: ${price(normalSum)}\nPrecio llevando el combo: ${price(finalPrice)} (Ahorras ${price(normalSum - finalPrice)})\n\nCatálogo completo: ${origin}/catalogo.html`;
+      $('#comboPreview').textContent = text;
+      $('#waComboBtn').href = `https://wa.me/?text=${encodeURIComponent(text)}`;
+      $('#copyComboBtn').onclick = async () => {
+        await navigator.clipboard.writeText(text);
+        toast('Texto del combo copiado');
+      };
+    };
+    $('#comboName').oninput = $('#comboDisc').oninput = $('#comboChecks').onchange = updateCombo;
+    updateCombo();
+
+    /* Lógica 3: Enlaces de campaña y QR */
+    const updateWaGen = () => {
+      const msg = $('#waCustomMsg').value;
+      const url = `https://wa.me/${D.settings.whatsapp || ''}?text=${encodeURIComponent(msg)}`;
+      $('#waGenUrl').value = url;
+      $('#testWaGen').href = url;
+    };
+    $('#waCustomMsg').oninput = updateWaGen;
+    updateWaGen();
+    $('#copyWaGen').onclick = async () => {
+      await navigator.clipboard.writeText($('#waGenUrl').value);
+      toast('Enlace de WhatsApp copiado');
+    };
+
+    const updateQr = () => {
+      const u = $('#qrTargetSel').value;
+      const qrApi = `https://api.qrserver.com/v1/create-qr-code/?size=320x320&margin=10&data=${encodeURIComponent(u)}`;
+      $('#qrImg').src = qrApi;
+      $('#qrUrlInput').value = u;
+      $('#dlQrBtn').href = qrApi;
+    };
+    $('#qrTargetSel').onchange = updateQr;
+    updateQr();
+    $('#copyQrUrl').onclick = async () => {
+      await navigator.clipboard.writeText($('#qrUrlInput').value);
+      toast('Enlace copiado');
+    };
+
+    /* Lógica 4: Simulador de rentabilidad */
+    const updateSim = () => {
+      const cost = Number($('#simCost').value || 0);
+      const pr = Number($('#simPrice').value || 0);
+      const disc = Number($('#simDisc').value || 0);
+      const goal = Number($('#simGoal').value || 0);
+      const finalP = Math.round(pr * (100 - disc)) / 100;
+      const unitProfit = finalP - cost;
+      const marginPct = finalP > 0 ? Math.round((unitProfit / finalP) * 100) : 0;
+      const unitsNeeded = unitProfit > 0 ? Math.ceil(goal / unitProfit) : 0;
+      $('#simResult').innerHTML = `
+        <div>Precio final de venta al cliente: <strong>${price(finalP)}</strong></div>
+        <div>Ganancia neta por unidad vendida: <strong style="color:${unitProfit > 0 ? 'var(--wa-solid)' : 'var(--danger)'}">${price(unitProfit)} (${marginPct}% de margen)</strong></div>
+        <div>Unidades necesarias para ganar ${price(goal)} al mes: <strong>${unitProfit > 0 ? `${unitsNeeded} ventas (${Math.ceil(unitsNeeded / 30)} por día)` : 'Ajusta el precio por encima del costo'}</strong></div>
+      `;
+    };
+    ['#simCost', '#simPrice', '#simDisc', '#simGoal'].forEach(id => $(id).oninput = updateSim);
+    updateSim();
+
+    $('#expJson').onclick = () => {
+      const blob = new Blob([JSON.stringify({ categories: D.categories, products: D.products }, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `catalogo-${D.settings.storeName || 'tienda'}.json`;
+      a.click();
+    };
+    $('#expCsv').onclick = () => {
+      const rows = [['ID', 'SKU', 'Nombre', 'Categoria', 'Costo', 'Precio', 'PrecioAnterior', 'Stock', 'Visible']];
+      D.products.forEach(p => rows.push([p.id, p.sku || '', `"${(p.name || '').replace(/"/g, '""')}"`, catName(p.cat), p.cost || 0, p.price, p.old || '', p.stock ? 'SI' : 'NO', p.visible ? 'SI' : 'NO']));
+      const blob = new Blob([rows.map(r => r.join(',')).join('\n')], { type: 'text/csv;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `productos-${D.settings.storeName || 'tienda'}.csv`;
+      a.click();
+    };
+    $('#impBtn').onclick = () => $('#impFile').click();
+    $('#impFile').onchange = async e => {
+      const f = e.target.files[0];
+      if (!f) return;
+      try {
+        const data = JSON.parse(await f.text());
+        if (!confirm('¿Reemplazar el catálogo actual con el archivo seleccionado?')) return;
+        const r = await api('POST', '/api/admin/import', data);
+        D.products = r.products;
+        D.categories = r.categories;
+        toast('Catálogo importado correctamente');
+      } catch (x) { toast('Archivo inválido: ' + x.message); }
+    };
+  }
+
+  /* =========================================================================
+     5. SEGURIDAD DE ACCESO
+     ========================================================================= */
+  function vSec() {
+    $('#view').innerHTML = `
+      <div class="head"><div><h1>Seguridad de acceso</h1><p>Actualiza la contraseña privada de tu panel de administración.</p></div></div>
+      ${D.defaultPassword ? '<div class="panel" style="background:var(--accent);color:var(--accent-ink)"><b>Estás utilizando la contraseña inicial (admin123).</b> Puedes cambiarla cuando gustes desde este formulario.</div>' : ''}
+      <form class="panel" id="pwForm" style="max-width:460px">
+        <h2>Actualizar contraseña</h2>
+        <div class="f"><label>Contraseña actual</label><input type="password" name="c" required autocomplete="current-password"></div>
+        <div class="f"><label>Nueva contraseña</label><input type="password" name="n" minlength="8" required autocomplete="new-password"><small>Mínimo 8 caracteres.</small></div>
+        <div class="err" id="pwErr"></div>
+        <button class="btn btn-dark">Guardar nueva contraseña</button>
+      </form>`;
+    $('#pwForm').onsubmit = async e => {
+      e.preventDefault();
+      try {
+        await api('POST', '/api/admin/password', { current: e.target.c.value, next: e.target.n.value });
+        D.defaultPassword = false;
+        toast('Contraseña actualizada');
+        vSec();
+      } catch (x) { $('#pwErr').textContent = x.message; }
+    };
+  }
+
+  $$('[data-t]').forEach(b => b.onclick = () => { tab = b.dataset.t; render(); });
+  $('#logout').onclick = () => logout();
+  if (token) {
+    boot();
+  } else if (!sessionStorage.getItem('manual_logout')) {
+    doLogin('admin123');
+  }
+})();
+</script>
+</body>
+</html>

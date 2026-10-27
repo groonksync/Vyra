@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Vyra</title>
+<meta name="description" content="Catálogo completo de productos. Consulta directa y compra por WhatsApp.">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<main class="container section" style="padding-top:24px">
+  <div class="section-header" style="margin-bottom:18px">
+    <div>
+      <span class="eyebrow" id="catEyebrow">Catálogo oficial</span>
+      <h2 id="catHeading">Explora todos los <em>productos.</em></h2>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-ghost btn-sm" id="shareCat"></button>
+      <a class="btn btn-wa btn-sm" id="waCatalog" target="_blank" rel="noopener"></a>
+    </div>
+  </div>
+
+  <div id="dealsBanner" hidden></div>
+
+  <div class="toolbar">
+    <div class="filters" id="filters"></div>
+    <div class="tools-right">
+      <input class="search" id="q" type="search" placeholder="Buscar producto o categoría..." aria-label="Buscar en el catálogo">
+      <button class="chip" id="onlyStockBtn" type="button">Disponible</button>
+      <select class="select" id="sort" aria-label="Ordenar productos">
+        <option value="nuevo">Más recientes</option>
+        <option value="descuento">Mayor ahorro / oferta</option>
+        <option value="menor">Precio: menor a mayor</option>
+        <option value="mayor">Precio: mayor a menor</option>
+        <option value="nombre">Nombre A–Z</option>
+      </select>
+      <div class="btn-row" id="colsBar" style="gap:4px">
+        <button class="chip" data-cols="4" title="Vista media (4 columnas)">4 col</button>
+        <button class="chip active" data-cols="5" title="Vista compacta (5 columnas)">5 col</button>
+        <button class="chip" data-cols="6" title="Vista ultra compacta (6 columnas)">6 col</button>
+      </div>
+      <span class="count" id="count"></span>
+    </div>
+  </div>
+  <div class="grid cols-5" id="grid">
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
+  </div>
+</main>
+<script src="/js/art.js"></script>
+<script src="/js/common.js"></script>
+<script>
+(async () => {
+  const S = Shop;
+  const { $, $$ } = S;
+  await S.load();
+  document.title = S.settings.storeName || 'Vyra';
+  S.chrome('catalog');
+
+  $('#shareCat').innerHTML = `${S.ico('share')}<span>Compartir catálogo</span>`;
+  $('#waCatalog').innerHTML = `${S.WA_SVG}<span>Consultar catálogo por WhatsApp</span>`;
+  $('#waCatalog').href = S.waLink('Hola, estoy viendo su catálogo en línea y quisiera hacer una consulta.');
+
+  const qs = new URLSearchParams(location.search);
+  let filter = qs.get('favoritos') ? 'favoritos' : qs.get('oferta') ? 'oferta' : qs.get('nuevo') ? 'nuevo' : (qs.get('cat') || 'todos');
+  let query = '';
+  let onlyStock = false;
+
+  const chips = [
+    ['todos', 'Ver todo', S.products.length],
+    ['oferta', 'En oferta', S.products.filter(p => S.pct(p)).length],
+    ...S.categories.filter(c => S.products.some(p => p.cat === c.id)).map(c => [c.id, c.name, S.products.filter(p => p.cat === c.id).length]),
+    ['favoritos', 'Mis favoritos', null]
+  ];
+
+  const renderChips = () => {
+    $('#filters').innerHTML = chips.map(([id, n, cnt]) =>
+      `<button class="chip ${id === filter ? 'active' : ''}" data-f="${id}"><span>${S.esc(n)}</span>${cnt !== null ? `<b>${cnt}</b>` : ''}</button>`
+    ).join('');
+  };
+
+  function render() {
+    const isDealMode = filter === 'oferta';
+    const banner = $('#dealsBanner');
+    if (isDealMode) {
+      const deals = S.products.filter(p => S.pct(p) > 0);
+      const maxPct = deals.reduce((m, p) => Math.max(m, S.pct(p)), 20);
+      banner.hidden = false;
+      banner.innerHTML = `
+        <div class="catalog-deals-banner">
+          <div>
+            <span class="deal-tag-live"><i></i>PRECIOS PROMOCIONALES ACTIVOS</span>
+            <h3>Aprovecha hasta -${maxPct}% de descuento directo en piezas seleccionadas</h3>
+            <p>Ahorro inmediato aplicado sobre el precio regular. Haz clic en cualquier producto para ver sus especificaciones completas o pedir por WhatsApp.</p>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-outline-light btn-sm" id="seeAllFromDeals">Ver todo el catálogo</button>
+          </div>
+        </div>`;
+      const seeAll = $('#seeAllFromDeals');
+      if (seeAll) seeAll.onclick = () => { filter = 'todos'; renderChips(); render(); };
+    } else {
+      banner.hidden = true;
+    }
+
+    let a = S.products.filter(p => {
+      if (onlyStock && !p.stock) return false;
+      if (filter === 'favoritos' && !S.isFav(p.id)) return false;
+      if (filter === 'oferta' && !S.pct(p)) return false;
+      if (filter === 'nuevo' && Date.now() - p.createdAt > 30 * 864e5 && S.products.indexOf(p) > 7) return false;
+      if (!['todos', 'favoritos', 'oferta', 'nuevo'].includes(filter) && p.cat !== filter) return false;
+      return !query || `${p.name} ${p.sku || ''} ${p.brand} ${p.desc} ${(p.specs || []).join(' ')} ${S.catName(p.cat)}`.toLowerCase().includes(query);
+    });
+    const k = $('#sort').value;
+    a.sort((x, y) =>
+      k === 'menor' ? x.price - y.price :
+      k === 'mayor' ? y.price - x.price :
+      k === 'descuento' ? ((y.old ? y.old - y.price : 0) - (x.old ? x.old - x.price : 0)) :
+      k === 'nombre' ? x.name.localeCompare(y.name) :
+      y.createdAt - x.createdAt
+    );
+    $('#count').textContent = `${a.length} ${a.length === 1 ? 'producto' : 'productos'}`;
+    $('#grid').innerHTML = a.length
+      ? a.map(isDealMode ? S.dealCard : S.card).join('')
+      : `<div class="empty"><h3>No se encontraron productos</h3><p style="margin-bottom:18px">Prueba otra categoría o término de búsqueda, o consúltanos directamente.</p><div class="btn-row" style="justify-content:center"><button class="btn btn-dark btn-sm" id="resetCat">Ver todo el catálogo</button><a class="btn btn-wa btn-sm" href="${S.waLink('Hola, busco un producto en su catálogo.')}" target="_blank" rel="noopener">${S.WA_SVG}<span>Consultar por WhatsApp</span></a></div></div>`;
+    const rBtn = $('#resetCat');
+    if (rBtn) rBtn.onclick = () => { filter = 'todos'; query = ''; onlyStock = false; $('#onlyStockBtn').classList.remove('active'); $('#q').value = ''; renderChips(); render(); };
+  }
+
+  renderChips();
+  render();
+  $('#filters').onclick = e => {
+    const b = e.target.closest('[data-f]');
+    if (!b) return;
+    filter = b.dataset.f;
+    renderChips();
+    render();
+  };
+  $('#onlyStockBtn').onclick = () => {
+    onlyStock = !onlyStock;
+    $('#onlyStockBtn').classList.toggle('active', onlyStock);
+    render();
+  };
+  $('#colsBar').onclick = e => {
+    const b = e.target.closest('[data-cols]');
+    if (!b) return;
+    $$('#colsBar .chip').forEach(c => c.classList.remove('active'));
+    b.classList.add('active');
+    const g = $('#grid');
+    g.classList.remove('cols-3', 'cols-4', 'cols-5', 'cols-6');
+    g.classList.add(`cols-${b.dataset.cols}`);
+  };
+  $('#q').oninput = e => { query = e.target.value.toLowerCase().trim(); render(); };
+  $('#sort').onchange = render;
+  $('#shareCat').onclick = S.shareCatalog;
+  S.bindCards($('#grid'));
+  document.addEventListener('favchange', () => { if (filter === 'favoritos') render(); });
+})();
+</script>
+</body>
+</html>
