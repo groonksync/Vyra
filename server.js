@@ -458,13 +458,13 @@ const sanitizeProduct = (b, prev = {}) => {
 async function api(req, res, url) {
   const route = req.method + ' ' + url.pathname;
 
-  if (route === 'GET /api/store') {
+  if (route === 'GET /api/store' || url.pathname.replace(/\/+$/, '') === '/api/store') {
     return send(res, 200, {
       settings: db.settings, categories: db.categories,
       products: db.products.filter(p => p.visible)
     }, { 'Cache-Control': 'no-store' });
   }
-  if (route === 'POST /api/login') {
+  if (route === 'POST /api/login' || url.pathname.replace(/\/+$/, '') === '/api/login') {
     const b = await readBody(req, 4096);
     const rawPw = String(b.password || '').trim();
     if (!verify(rawPw, db.admin.password)) {
@@ -475,7 +475,7 @@ async function api(req, res, url) {
     return send(res, 200, { token, defaultPassword: !!db.admin.defaultPassword });
   }
 
-  if (!url.pathname.startsWith('/api/admin/')) return send(res, 404, { error: 'No encontrado' });
+  if (!url.pathname.startsWith('/api/admin/')) return send(res, 404, { error: 'No encontrado', pathname: url.pathname, method: req.method, rawUrl: req.url });
   const token = authed(req);
   if (!token) return send(res, 401, { error: 'Sesión no válida' });
 

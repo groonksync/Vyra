@@ -1,7 +1,14 @@
 {
   "functions": {
-    "server.js": {
+    "api/index.js": {
       "includeFiles": "{public/**,data/**}"
     }
-  }
+  },
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/index.js" },
+    { "source": "/catalogo", "destination": "/catalogo.html" },
+    { "source": "/producto", "destination": "/producto.html" },
+    { "source": "/admin", "destination": "/admin.html" }
+  ]
 }
