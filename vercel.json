@@ -1,10 +1,7 @@
 {
-  "buildCommand": "",
-  "outputDirectory": "public",
-  "cleanUrls": true,
-  "rewrites": [
-    { "source": "/catalogo", "destination": "/catalogo.html" },
-    { "source": "/producto", "destination": "/producto.html" },
-    { "source": "/admin", "destination": "/admin.html" }
-  ]
+  "functions": {
+    "server.js": {
+      "includeFiles": "{public/**,data/**}"
+    }
+  }
 }

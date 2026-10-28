@@ -7,7 +7,7 @@ const path = require('path');
 const crypto = require('crypto');
 
 const PORT = process.env.PORT || 3000;
-const ROOT = path.resolve(__dirname, '..');
+const ROOT = __dirname;
 const PUBLIC = path.join(ROOT, 'public');
 const IS_VERCEL = !!process.env.VERCEL;
 const SEED_DB_FILE = path.join(ROOT, 'data', 'db.json');
@@ -640,14 +640,16 @@ function productPage(url, req) {
 
 /* ---------- Servidor ---------- */
 function serveStatic(res, file) {
-  fs.readFile(file, (err, data) => {
-    if (err) return send(res, 404, 'No encontrado', { 'Content-Type': 'text/plain; charset=utf-8' });
+  try {
+    const data = fs.readFileSync(file);
     const ext = path.extname(file).toLowerCase();
     send(res, 200, data, {
       'Content-Type': MIME[ext] || 'application/octet-stream',
       'Cache-Control': file.startsWith(UPLOADS) ? 'public, max-age=604800' : 'no-cache'
     });
-  });
+  } catch {
+    send(res, 404, 'No encontrado', { 'Content-Type': 'text/plain; charset=utf-8' });
+  }
 }
 
 async function handleRequest(req, res) {
