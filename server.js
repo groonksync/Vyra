@@ -458,7 +458,7 @@ const sanitizeProduct = (b, prev = {}) => {
 async function api(req, res, url) {
   const route = req.method + ' ' + url.pathname;
 
-  if (route === 'GET /api/store' || url.pathname.replace(/\/+$/, '') === '/api/store' || (url.pathname === '/api/index.js' && req.method === 'GET')) {
+  if ((req.method === 'GET' || req.method === 'HEAD') && (route.endsWith('/api/store') || url.pathname.replace(/\/+$/, '') === '/api/store' || url.pathname === '/api/index.js')) {
     return send(res, 200, {
       settings: db.settings, categories: db.categories,
       products: db.products.filter(p => p.visible)
