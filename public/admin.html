@@ -469,35 +469,102 @@ body { background: var(--bg); }
     toast.t = setTimeout(() => t.classList.remove('on'), 2400);
   };
 
+  function saveLocalOverride() {
+    setTimeout(() => {
+      if (D && D.settings && Array.isArray(D.products)) {
+        try {
+          localStorage.setItem('vyra_store_override', JSON.stringify({
+            settings: D.settings,
+            categories: D.categories,
+            products: D.products
+          }));
+        } catch {}
+      }
+    }, 50);
+  }
+
+  function localApiFallback(method, url, body = {}) {
+    if (url === '/api/admin/upload') return { url: body.data };
+    if (url === '/api/admin/settings') return { ...(D ? D.settings : {}), ...body };
+    if (url === '/api/admin/categories') return body.categories || [];
+    if (url === '/api/admin/products' && method === 'POST') {
+      return { id: Date.now().toString(36), createdAt: Date.now(), stock: true, visible: true, featured: false, images: [], specs: [], variants: [], ...body };
+    }
+    const pm = url.match(/^\/api\/admin\/products\/([\w-]+)$/);
+    if (pm) {
+      if (method === 'DELETE') return { ok: true };
+      const prev = (D && D.products ? D.products.find(p => p.id === pm[1]) : null) || {};
+      return { ...prev, ...body };
+    }
+    if (url === '/api/admin/bulk' && D && Array.isArray(D.products)) {
+      const ids = Array.isArray(body.ids) && body.ids.length ? new Set(body.ids) : null;
+      const cat = body.cat || '';
+      const act = body.action;
+      const val = Number(body.value) || 0;
+      D.products.forEach(p => {
+        if (ids && !ids.has(p.id)) return;
+        if (cat && p.cat !== cat) return;
+        if (act === 'discount' && val > 0 && val < 100) {
+          const base = p.old && p.old > p.price ? p.old : p.price;
+          p.old = base;
+          p.price = Math.round(base * (100 - val)) / 100;
+        } else if (act === 'restore') {
+          if (p.old && p.old > p.price) { p.price = p.old; p.old = null; }
+        } else if (act === 'show') p.visible = true;
+        else if (act === 'hide') p.visible = false;
+        else if (act === 'stock_in') p.stock = true;
+        else if (act === 'stock_out') p.stock = false;
+        else if (act === 'feature_all') p.featured = true;
+      });
+      return { products: D.products };
+    }
+    if (url === '/api/admin/import') {
+      return {
+        products: Array.isArray(body.products) ? body.products : (D ? D.products : []),
+        categories: Array.isArray(body.categories) ? body.categories : (D ? D.categories : [])
+      };
+    }
+    return { ok: true };
+  }
+
   async function api(method, url, body) {
-    const r = await fetch(url, {
-      method,
-      headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
-      body: body ? JSON.stringify(body) : undefined
-    });
-    const d = await r.json().catch(() => ({}));
-    if (r.status === 401 && url !== '/api/login') {
-      token = null;
-      localStorage.removeItem('adm_token');
-      $('#login').hidden = false;
-      $('#app').hidden = true;
-      throw new Error('Sesión expirada');
-    }
-    if (!r.ok) throw new Error(d.error || 'Error en la solicitud');
-    if (method !== 'GET' && url.startsWith('/api/admin/')) {
-      setTimeout(() => {
-        if (D && D.settings && Array.isArray(D.products)) {
-          try {
-            localStorage.setItem('vyra_store_override', JSON.stringify({
-              settings: D.settings,
-              categories: D.categories,
-              products: D.products
-            }));
-          } catch {}
+    try {
+      const r = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
+        body: body ? JSON.stringify(body) : undefined
+      });
+      if (r.status === 404 || r.status === 405) {
+        if (url.startsWith('/api/admin/') && method !== 'GET') {
+          const res = localApiFallback(method, url, body);
+          saveLocalOverride();
+          return res;
         }
-      }, 60);
+      }
+      const d = await r.json().catch(() => ({}));
+      if (r.status === 401 && url !== '/api/login') {
+        if (window.VYRA_DEFAULT_STORE && url.startsWith('/api/admin/') && method !== 'GET') {
+          const res = localApiFallback(method, url, body);
+          saveLocalOverride();
+          return res;
+        }
+        token = null;
+        localStorage.removeItem('adm_token');
+        $('#login').hidden = false;
+        $('#app').hidden = true;
+        throw new Error('Sesión expirada');
+      }
+      if (!r.ok) throw new Error(d.error || 'Error en la solicitud');
+      if (method !== 'GET' && url.startsWith('/api/admin/')) saveLocalOverride();
+      return d;
+    } catch (err) {
+      if (url.startsWith('/api/admin/') && method !== 'GET' && window.VYRA_DEFAULT_STORE) {
+        const res = localApiFallback(method, url, body);
+        saveLocalOverride();
+        return res;
+      }
+      throw err;
     }
-    return d;
   }
 
   const logout = async (silent) => {

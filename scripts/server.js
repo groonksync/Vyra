@@ -7,7 +7,7 @@ const path = require('path');
 const crypto = require('crypto');
 
 const PORT = process.env.PORT || 3000;
-const ROOT = __dirname;
+const ROOT = path.resolve(__dirname, '..');
 const PUBLIC = path.join(ROOT, 'public');
 const IS_VERCEL = !!process.env.VERCEL;
 const SEED_DB_FILE = path.join(ROOT, 'data', 'db.json');
