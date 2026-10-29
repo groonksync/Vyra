@@ -112,17 +112,24 @@ img {
   margin-inline: auto;
 }
 
-/* ---------- Iconografía SVG uniforme ---------- */
+/* ---------- Iconografía SVG Uniforme y Calibrada Matemáticamente ---------- */
 .icon {
   width: 18px;
   height: 18px;
   stroke: currentColor;
   fill: none;
-  stroke-width: 1.8;
+  stroke-width: 1.85px;
   stroke-linecap: round;
   stroke-linejoin: round;
   flex-shrink: 0;
+  display: inline-block;
+  vertical-align: middle;
 }
+.icon-xs { width: 13px; height: 13px; stroke-width: 2px; }
+.icon-sm { width: 15px; height: 15px; stroke-width: 1.95px; }
+.icon-md { width: 20px; height: 20px; stroke-width: 1.85px; }
+.icon-lg { width: 26px; height: 26px; stroke-width: 1.8px; }
+.icon-xl { width: 34px; height: 34px; stroke-width: 1.75px; }
 
 /* ---------- Escala Tipográfica Unificada ---------- */
 .eyebrow {
@@ -1111,24 +1118,25 @@ html[data-theme="dark"] .feature-primary {
 .card {
   background: var(--paper);
   border: 0;
-  border-radius: 16px;
+  border-radius: 18px;
   padding: 10px;
   display: flex;
   flex-direction: column;
-  transition: transform 0.22s ease, box-shadow 0.22s ease;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-4px);
   box-shadow: var(--shadow);
 }
 
 .photo {
-  aspect-ratio: 1 / 0.88;
+  aspect-ratio: 1 / 0.96;
   position: relative;
-  border-radius: 12px;
+  border-radius: 14px;
   overflow: hidden;
-  background: var(--tile);
+  background: var(--surface);
   display: block;
 }
 
@@ -1136,15 +1144,17 @@ html[data-theme="dark"] .feature-primary {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  transition: transform 0.45s ease;
+  padding: 8px;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .photo img.real {
   object-fit: cover;
+  padding: 0;
 }
 
 .card:hover .photo img {
-  transform: scale(1.05);
+  transform: scale(1.06);
 }
 
 .badge {
@@ -1153,7 +1163,7 @@ html[data-theme="dark"] .feature-primary {
   top: 8px;
   background: rgba(18, 21, 19, 0.82);
   color: #ffffff;
-  backdrop-filter: blur(6px);
+  backdrop-filter: blur(8px);
   z-index: 2;
   padding: 4px 8px;
   border-radius: 7px;
@@ -1174,9 +1184,9 @@ html[data-theme="dark"] .feature-primary {
   position: absolute;
   left: 8px;
   bottom: 8px;
-  background: rgba(18, 21, 19, 0.86);
+  background: rgba(18, 21, 19, 0.88);
   color: var(--accent);
-  backdrop-filter: blur(6px);
+  backdrop-filter: blur(8px);
   z-index: 2;
   padding: 4px 8px;
   border-radius: 7px;
@@ -1188,7 +1198,7 @@ html[data-theme="dark"] .feature-primary {
 .soldout {
   position: absolute;
   inset: 0;
-  background: rgba(12, 15, 13, 0.68);
+  background: rgba(12, 15, 13, 0.72);
   color: #ffffff;
   display: grid;
   place-items: center;
@@ -1207,10 +1217,10 @@ html[data-theme="dark"] .feature-primary {
 }
 
 .label {
-  font-size: 9.5px;
+  font-size: 10px;
   font-weight: 700;
   color: var(--muted);
-  letter-spacing: 0.11em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   margin-bottom: 4px;
 }
@@ -1228,8 +1238,9 @@ html[data-theme="dark"] .feature-primary {
 }
 
 .price {
-  font-size: 15px;
+  font-size: 15.5px;
   font-weight: 800;
+  letter-spacing: -0.025em;
   margin-top: 6px;
   display: flex;
   gap: 6px;
