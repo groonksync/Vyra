@@ -69,12 +69,13 @@
   $('#waCatalog').href = S.waLink('Hola, estoy viendo su catálogo en línea y quisiera hacer una consulta.');
 
   const qs = new URLSearchParams(location.search);
-  let filter = qs.get('favoritos') ? 'favoritos' : qs.get('oferta') ? 'oferta' : qs.get('nuevo') ? 'nuevo' : (qs.get('cat') || 'todos');
+  let filter = (qs.get('marca') && qs.get('marca').toLowerCase() === 'ugreen') ? 'ugreen' : qs.get('favoritos') ? 'favoritos' : qs.get('oferta') ? 'oferta' : qs.get('nuevo') ? 'nuevo' : (qs.get('cat') || 'todos');
   let query = '';
   let onlyStock = false;
 
   const chips = [
     ['todos', 'Ver todo', S.products.length],
+    ['ugreen', 'UGREEN Oficial', S.products.filter(p => p.brand === 'UGREEN').length],
     ['oferta', 'En oferta', S.products.filter(p => S.pct(p)).length],
     ...S.categories.filter(c => S.products.some(p => p.cat === c.id)).map(c => [c.id, c.name, S.products.filter(p => p.cat === c.id).length]),
     ['favoritos', 'Mis favoritos', null]
@@ -114,8 +115,9 @@
       if (onlyStock && !p.stock) return false;
       if (filter === 'favoritos' && !S.isFav(p.id)) return false;
       if (filter === 'oferta' && !S.pct(p)) return false;
+      if (filter === 'ugreen' && p.brand !== 'UGREEN') return false;
       if (filter === 'nuevo' && Date.now() - p.createdAt > 30 * 864e5 && S.products.indexOf(p) > 7) return false;
-      if (!['todos', 'favoritos', 'oferta', 'nuevo'].includes(filter) && p.cat !== filter) return false;
+      if (!['todos', 'favoritos', 'oferta', 'nuevo', 'ugreen'].includes(filter) && p.cat !== filter) return false;
       return !query || `${p.name} ${p.sku || ''} ${p.brand} ${p.desc} ${(p.specs || []).join(' ')} ${S.catName(p.cat)}`.toLowerCase().includes(query);
     });
     const k = $('#sort').value;
